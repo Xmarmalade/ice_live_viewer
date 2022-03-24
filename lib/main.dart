@@ -337,7 +337,7 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                         String saveDataLink =
                                                             rawLink.replaceAll(
                                                                 'imgplus.flv',
-                                                                'imgplus_1000.flv');
+                                                                'imgplus_1500.flv');
                                                         return <
                                                             PopupMenuEntry<
                                                                 String>>[
@@ -354,7 +354,7 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                           PopupMenuItem(
                                                             value: saveDataLink,
                                                             child: const Text(
-                                                                '360P'),
+                                                                '540P'),
                                                           ),
                                                         ];
                                                       },
@@ -403,7 +403,7 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                         String saveDataLink =
                                                             rawLink.replaceAll(
                                                                 'imgplus.flv',
-                                                                'imgplus_1000.flv');
+                                                                'imgplus_1500.flv');
                                                         return <
                                                             PopupMenuEntry<
                                                                 String>>[
@@ -420,7 +420,7 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                           PopupMenuItem(
                                                             value: saveDataLink,
                                                             child: const Text(
-                                                                '360P'),
+                                                                '540P'),
                                                           ),
                                                         ];
                                                       },
@@ -469,7 +469,7 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                         String saveDataLink =
                                                             rawLink.replaceAll(
                                                                 'imgplus.flv',
-                                                                'imgplus_1000.flv');
+                                                                'imgplus_1500.flv');
                                                         return <
                                                             PopupMenuEntry<
                                                                 String>>[
@@ -486,7 +486,7 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                           PopupMenuItem(
                                                             value: saveDataLink,
                                                             child: const Text(
-                                                                '360P'),
+                                                                '540P'),
                                                           ),
                                                         ];
                                                       },
@@ -535,7 +535,7 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                         String saveDataLink =
                                                             rawLink.replaceAll(
                                                                 'imgplus.flv',
-                                                                'imgplus_1000.flv');
+                                                                'imgplus_1500.flv');
                                                         return <
                                                             PopupMenuEntry<
                                                                 String>>[
@@ -552,7 +552,7 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                           PopupMenuItem(
                                                             value: saveDataLink,
                                                             child: const Text(
-                                                                '360P'),
+                                                                '540P'),
                                                           ),
                                                         ];
                                                       },
