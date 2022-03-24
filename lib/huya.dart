@@ -75,3 +75,5 @@ Future<List> getLiveList(String url) async {
 6_cdnType,
 7_cdnUrl]
 */
+
+//al cdn may unavailable, use tx hw or bd
