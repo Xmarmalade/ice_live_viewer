@@ -32,6 +32,7 @@ dependencies:
   html: ^0.15.0
   http: ^0.13.4
   shared_preferences: ^2.0.13
+  dart_vlc: ^0.2.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
 

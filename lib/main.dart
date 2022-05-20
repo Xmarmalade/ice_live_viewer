@@ -1,11 +1,14 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:dart_vlc/dart_vlc.dart';
 
 import 'package:ice_live_viewer/huya.dart' as huya;
+import 'package:ice_live_viewer/play.dart';
 import 'package:ice_live_viewer/storage.dart' as storage;
 
 void main() {
+  DartVLC.initialize();
   runApp(const MyApp());
 }
 
@@ -112,9 +115,7 @@ class HomeDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Settings'),
             leading: const Icon(Icons.settings),
-            onTap: () {
-              //TODO: open settings page
-            },
+            onTap: () {},
           ),
           ListTile(
             title: const Text('Refresh Data'),
@@ -268,6 +269,138 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                     showDialog(
                                         context: context,
                                         builder: (context) {
+                                          final roomName = (snapshot.data!
+                                              as List<dynamic>)[3];
+                                          final roomCdnLength = (snapshot.data!
+                                              as List<dynamic>)[5];
+                                          List<Widget> cdnListTiles = [];
+                                          for (var i = 1;
+                                              i <= roomCdnLength;
+                                              i++) {
+                                            cdnListTiles.add(ListTile(
+                                              leading: Text((snapshot.data!
+                                                  as List<dynamic>)[i * 2 + 4]),
+                                              subtitle: Text(
+                                                (snapshot.data! as List<
+                                                    dynamic>)[i * 2 + 5],
+                                                maxLines: 2,
+                                              ),
+                                              trailing: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  PopupMenuButton<String>(
+                                                    icon:
+                                                        const Icon(Icons.copy),
+                                                    onSelected: (context) {
+                                                      Clipboard.setData(
+                                                          ClipboardData(
+                                                              text: context));
+                                                      //show a scaffold to show the copy success
+                                                      ScaffoldMessenger.of(
+                                                              this.context)
+                                                          .showSnackBar(
+                                                              const SnackBar(
+                                                                  content: Text(
+                                                        'Copied to clipboard',
+                                                      )));
+                                                    },
+                                                    itemBuilder: (context) {
+                                                      String rawLink = (snapshot
+                                                                  .data!
+                                                              as List<dynamic>)[
+                                                          i * 2 + 5];
+                                                      String hdLink =
+                                                          rawLink.replaceAll(
+                                                              'imgplus.flv',
+                                                              'imgplus_4000.flv');
+                                                      String sdLink =
+                                                          rawLink.replaceAll(
+                                                              'imgplus.flv',
+                                                              'imgplus_2000.flv');
+                                                      String saveDataLink =
+                                                          rawLink.replaceAll(
+                                                              'imgplus.flv',
+                                                              'imgplus_1500.flv');
+                                                      return <
+                                                          PopupMenuEntry<
+                                                              String>>[
+                                                        PopupMenuItem(
+                                                          value: hdLink,
+                                                          child: const Text(
+                                                              '1080P'),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: sdLink,
+                                                          child: const Text(
+                                                              '720P'),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: saveDataLink,
+                                                          child: const Text(
+                                                              '540P'),
+                                                        ),
+                                                      ];
+                                                    },
+                                                  ),
+                                                  PopupMenuButton<String>(
+                                                    icon: const Icon(
+                                                        Icons.play_arrow),
+                                                    onSelected: (context) {
+                                                      var roomSelectedUrl =
+                                                          context;
+                                                      Navigator.push(
+                                                          this.context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  StreamPlayer(
+                                                                    title:
+                                                                        roomName,
+                                                                    url:
+                                                                        roomSelectedUrl,
+                                                                  )));
+                                                    },
+                                                    itemBuilder: (context) {
+                                                      String rawLink = (snapshot
+                                                                  .data!
+                                                              as List<dynamic>)[
+                                                          i * 2 + 5];
+                                                      String hdLink =
+                                                          rawLink.replaceAll(
+                                                              'imgplus.flv',
+                                                              'imgplus_4000.flv');
+                                                      String sdLink =
+                                                          rawLink.replaceAll(
+                                                              'imgplus.flv',
+                                                              'imgplus_2000.flv');
+                                                      String saveDataLink =
+                                                          rawLink.replaceAll(
+                                                              'imgplus.flv',
+                                                              'imgplus_1500.flv');
+                                                      return <
+                                                          PopupMenuEntry<
+                                                              String>>[
+                                                        PopupMenuItem(
+                                                          value: hdLink,
+                                                          child: const Text(
+                                                              '1080P'),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: sdLink,
+                                                          child: const Text(
+                                                              '720P'),
+                                                        ),
+                                                        PopupMenuItem(
+                                                          value: saveDataLink,
+                                                          child: const Text(
+                                                              '540P'),
+                                                        ),
+                                                      ];
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ));
+                                          }
                                           return AlertDialog(
                                             scrollable: true,
                                             title: Text((snapshot.data!
@@ -295,270 +428,11 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                         : const CircularProgressIndicator();
                                                   }),
                                                   //gridview to show the links and copy button
-                                                  ListTile(
-                                                    leading: Text((snapshot
-                                                            .data!
-                                                        as List<dynamic>)[6]),
-                                                    subtitle: Text(
-                                                      (snapshot.data!
-                                                          as List<dynamic>)[7],
-                                                      maxLines: 2,
-                                                    ),
-                                                    trailing:
-                                                        PopupMenuButton<String>(
-                                                      icon: const Icon(
-                                                          Icons.copy),
-                                                      onSelected: (context) {
-                                                        Clipboard.setData(
-                                                            ClipboardData(
-                                                                text: context));
-                                                        //show a scaffold to show the copy success
-                                                        ScaffoldMessenger.of(
-                                                                this.context)
-                                                            .showSnackBar(
-                                                                const SnackBar(
-                                                                    content:
-                                                                        Text(
-                                                          'Copied to clipboard',
-                                                        )));
-                                                      },
-                                                      itemBuilder: (context) {
-                                                        String rawLink =
-                                                            (snapshot.data!
-                                                                as List<
-                                                                    dynamic>)[7];
-                                                        String hdLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_4000.flv');
-                                                        String sdLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_2000.flv');
-                                                        String saveDataLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_1500.flv');
-                                                        return <
-                                                            PopupMenuEntry<
-                                                                String>>[
-                                                          PopupMenuItem(
-                                                            value: hdLink,
-                                                            child: const Text(
-                                                                '1080P'),
-                                                          ),
-                                                          PopupMenuItem(
-                                                            value: sdLink,
-                                                            child: const Text(
-                                                                '720P'),
-                                                          ),
-                                                          PopupMenuItem(
-                                                            value: saveDataLink,
-                                                            child: const Text(
-                                                                '540P'),
-                                                          ),
-                                                        ];
-                                                      },
-                                                    ),
-                                                  ),
-                                                  ListTile(
-                                                    leading: Text((snapshot
-                                                            .data!
-                                                        as List<dynamic>)[8]),
-                                                    subtitle: Text(
-                                                      (snapshot.data!
-                                                          as List<dynamic>)[9],
-                                                      maxLines: 2,
-                                                    ),
-                                                    trailing:
-                                                        PopupMenuButton<String>(
-                                                      icon: const Icon(
-                                                          Icons.copy),
-                                                      onSelected: (context) {
-                                                        Clipboard.setData(
-                                                            ClipboardData(
-                                                                text: context));
-                                                        //show a scaffold to show the copy success
-                                                        ScaffoldMessenger.of(
-                                                                this.context)
-                                                            .showSnackBar(
-                                                                const SnackBar(
-                                                                    content:
-                                                                        Text(
-                                                          'Copied to clipboard',
-                                                        )));
-                                                      },
-                                                      itemBuilder: (context) {
-                                                        String rawLink =
-                                                            (snapshot.data!
-                                                                as List<
-                                                                    dynamic>)[9];
-                                                        String hdLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_4000.flv');
-                                                        String sdLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_2000.flv');
-                                                        String saveDataLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_1500.flv');
-                                                        return <
-                                                            PopupMenuEntry<
-                                                                String>>[
-                                                          PopupMenuItem(
-                                                            value: hdLink,
-                                                            child: const Text(
-                                                                '1080P'),
-                                                          ),
-                                                          PopupMenuItem(
-                                                            value: sdLink,
-                                                            child: const Text(
-                                                                '720P'),
-                                                          ),
-                                                          PopupMenuItem(
-                                                            value: saveDataLink,
-                                                            child: const Text(
-                                                                '540P'),
-                                                          ),
-                                                        ];
-                                                      },
-                                                    ),
-                                                  ),
-                                                  ListTile(
-                                                    leading: Text((snapshot
-                                                            .data!
-                                                        as List<dynamic>)[10]),
-                                                    subtitle: Text(
-                                                      (snapshot.data!
-                                                          as List<dynamic>)[11],
-                                                      maxLines: 2,
-                                                    ),
-                                                    trailing:
-                                                        PopupMenuButton<String>(
-                                                      icon: const Icon(
-                                                          Icons.copy),
-                                                      onSelected: (context) {
-                                                        Clipboard.setData(
-                                                            ClipboardData(
-                                                                text: context));
-                                                        //show a scaffold to show the copy success
-                                                        ScaffoldMessenger.of(
-                                                                this.context)
-                                                            .showSnackBar(
-                                                                const SnackBar(
-                                                                    content:
-                                                                        Text(
-                                                          'Copied to clipboard',
-                                                        )));
-                                                      },
-                                                      itemBuilder: (context) {
-                                                        String rawLink =
-                                                            (snapshot.data!
-                                                                as List<
-                                                                    dynamic>)[11];
-                                                        String hdLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_4000.flv');
-                                                        String sdLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_2000.flv');
-                                                        String saveDataLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_1500.flv');
-                                                        return <
-                                                            PopupMenuEntry<
-                                                                String>>[
-                                                          PopupMenuItem(
-                                                            value: hdLink,
-                                                            child: const Text(
-                                                                '1080P'),
-                                                          ),
-                                                          PopupMenuItem(
-                                                            value: sdLink,
-                                                            child: const Text(
-                                                                '720P'),
-                                                          ),
-                                                          PopupMenuItem(
-                                                            value: saveDataLink,
-                                                            child: const Text(
-                                                                '540P'),
-                                                          ),
-                                                        ];
-                                                      },
-                                                    ),
-                                                  ),
-                                                  ListTile(
-                                                    leading: Text((snapshot
-                                                            .data!
-                                                        as List<dynamic>)[12]),
-                                                    subtitle: Text(
-                                                      (snapshot.data!
-                                                          as List<dynamic>)[13],
-                                                      maxLines: 2,
-                                                    ),
-                                                    trailing:
-                                                        PopupMenuButton<String>(
-                                                      icon: const Icon(
-                                                          Icons.copy),
-                                                      onSelected: (context) {
-                                                        Clipboard.setData(
-                                                            ClipboardData(
-                                                                text: context));
-                                                        //show a scaffold to show the copy success
-                                                        ScaffoldMessenger.of(
-                                                                this.context)
-                                                            .showSnackBar(
-                                                                const SnackBar(
-                                                                    content:
-                                                                        Text(
-                                                          'Copied to clipboard',
-                                                        )));
-                                                      },
-                                                      itemBuilder: (context) {
-                                                        String rawLink =
-                                                            (snapshot.data!
-                                                                as List<
-                                                                    dynamic>)[13];
-                                                        String hdLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_4000.flv');
-                                                        String sdLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_2000.flv');
-                                                        String saveDataLink =
-                                                            rawLink.replaceAll(
-                                                                'imgplus.flv',
-                                                                'imgplus_1500.flv');
-                                                        return <
-                                                            PopupMenuEntry<
-                                                                String>>[
-                                                          PopupMenuItem(
-                                                            value: hdLink,
-                                                            child: const Text(
-                                                                '1080P'),
-                                                          ),
-                                                          PopupMenuItem(
-                                                            value: sdLink,
-                                                            child: const Text(
-                                                                '720P'),
-                                                          ),
-                                                          PopupMenuItem(
-                                                            value: saveDataLink,
-                                                            child: const Text(
-                                                                '540P'),
-                                                          ),
-                                                        ];
-                                                      },
-                                                    ),
-                                                  ),
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: cdnListTiles,
+                                                  )
                                                 ],
                                               ),
                                             ),
@@ -586,11 +460,12 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                   )),
             );
           } else if (snapshot.hasError) {
-            return Text('${snapshot.error}');
+            return ListTile(
+              leading: const Icon(Icons.error_outline),
+              title: Text('${snapshot.error}'),
+            );
           }
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: LinearProgressIndicator());
         });
   }
 }
