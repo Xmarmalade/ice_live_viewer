@@ -13,7 +13,7 @@ class StreamPlayer extends StatefulWidget {
 class _StreamPlayerState extends State<StreamPlayer> {
   @override
   Widget build(BuildContext context) {
-    final streamPlayer = Player(id: 114514, registerTexture: false);
+    final streamPlayer = Player(id: 11);
     final streamInfo = Media.network(widget.url);
     streamPlayer.open(streamInfo, autoStart: true);
     return Scaffold(
@@ -28,7 +28,7 @@ class _StreamPlayerState extends State<StreamPlayer> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: NativeVideo(
+        child: Video(
           player: streamPlayer,
           showControls: true,
         ),
