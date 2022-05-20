@@ -120,7 +120,11 @@ class HomeDrawer extends StatelessWidget {
           ListTile(
             title: const Text('Refresh Data'),
             leading: const Icon(Icons.refresh),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const Home();
+              }));
+            },
           ),
           ListTile(
             title: const Text('Clear Data'),
@@ -169,7 +173,7 @@ class HomeDrawer extends StatelessWidget {
                 showAboutDialog(
                     context: context,
                     applicationName: 'IceLiveViewer',
-                    applicationVersion: '1.0.0',
+                    applicationVersion: 'beta v2',
                     applicationIcon: const Icon(
                       Icons.icecream,
                       size: 64.0,
@@ -179,7 +183,7 @@ class HomeDrawer extends StatelessWidget {
                       const Text(
                           'IceLiveViewer is a simple app to view streams.'),
                       const Text(
-                          'This app is open source and is available on GitHub.')
+                          'Sometimes the inner VLC player can\'t play the stream, you can download vlc and use it to play the stream.'),
                     ]);
               })
         ],
@@ -246,8 +250,15 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                     showDialog(
                                         context: context,
                                         builder: (context) {
-                                          return const AlertDialog(
-                                            title: Text('OFFLINE'),
+                                          return AlertDialog(
+                                            title: const Text('Offline'),
+                                            actions: [
+                                              TextButton(
+                                                  child: const Text('Delete'),
+                                                  onPressed: () {
+                                                    //TODO: delete the link
+                                                  }),
+                                            ],
                                           );
                                         });
                                   },
@@ -437,6 +448,11 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                               ),
                                             ),
                                             actions: <Widget>[
+                                              TextButton(
+                                                  child: const Text('Delete'),
+                                                  onPressed: () {
+                                                    //TODO: delete the link
+                                                  }),
                                               ElevatedButton(
                                                 child: const Text('Back'),
                                                 onPressed: () {
@@ -450,7 +466,34 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                 );
                               }
                             } else if (snapshot.hasError) {
-                              return Text('${snapshot.error}');
+                              return ListTile(
+                                leading: const Icon(
+                                  Icons.tv_off_sharp,
+                                  size: 40.0,
+                                  color: Color.fromARGB(255, 255, 112, 112),
+                                ),
+                                title: const Text('Error'),
+                                subtitle: const Text(
+                                    'For specific reasons, we do not have access to this live room'),
+                                trailing: const Icon(Icons.chevron_right_sharp),
+                                onTap: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                            title: Text('${snapshot.error}'),
+                                            content: const Text(
+                                                'For specific reasons, we do not have access to this live room. Please check whether this live room can be accessed normally, if not, please submit the error message above.'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                  child: const Text('Delete'),
+                                                  onPressed: () {
+                                                    //TODO: delete the link
+                                                  })
+                                            ]);
+                                      });
+                                },
+                              );
                             }
                             return const Center(
                               child: CircularProgressIndicator(),
@@ -465,7 +508,7 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
               title: Text('${snapshot.error}'),
             );
           }
-          return const Center(child: LinearProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         });
   }
 }
