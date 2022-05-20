@@ -8,7 +8,7 @@ import 'package:ice_live_viewer/play.dart';
 import 'package:ice_live_viewer/storage.dart' as storage;
 
 void main() {
-  DartVLC.initialize();
+  DartVLC.initialize(useFlutterNativeView: true);
   runApp(const MyApp());
 }
 
