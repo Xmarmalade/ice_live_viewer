@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
+//This code is used to parse the live address
+
 Future<String> _getLiveHtml(String url) async {
   //get html from url
   var resp = await http.get(
@@ -64,7 +66,6 @@ Future<List> getLiveList(String url) async {
   return returnList;
 }
 
-
 /*
 [0_0(off)_or_1(on), 
 1_name, 
@@ -75,5 +76,3 @@ Future<List> getLiveList(String url) async {
 6_cdnType,
 7_cdnUrl]
 */
-
-//al cdn may unavailable, use tx hw or bd
