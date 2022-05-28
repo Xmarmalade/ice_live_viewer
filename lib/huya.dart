@@ -36,6 +36,7 @@ Future<List> getLiveList(String url) async {
     var roomIntroduction = data['roomInfo']['tLiveInfo']['sIntroduction'];
     var sAvatar180 = data['roomInfo']['tLiveInfo']['sAvatar180'];
     var sScreenshot = data['roomInfo']['tLiveInfo']['sScreenshot'];
+    sScreenshot = sScreenshot.replaceAll('http', 'https');
     //add basic info
     returnList.add(1);
     returnList.add(sNick);
@@ -46,10 +47,11 @@ Future<List> getLiveList(String url) async {
     //add cdn info
     for (var i = 0, len = roomValue.length; i < len; i++) {
       var cdnType = (roomValue[i]['sCdnType']);
-
+      var cdnHttpUrl = data['roomInfo']['tLiveInfo']["tLiveStreamInfo"]
+          ["vStreamInfo"]["value"][i]["sFlvUrl"];
+      var cdnHttpsUrl = cdnHttpUrl.replaceAll('http', 'https');
       returnList.add(cdnType);
-      returnList.add(data['roomInfo']['tLiveInfo']["tLiveStreamInfo"]
-              ["vStreamInfo"]["value"][i]["sFlvUrl"] +
+      returnList.add(cdnHttpsUrl +
           '/' +
           data['roomInfo']['tLiveInfo']["tLiveStreamInfo"]["vStreamInfo"]
               ["value"][i]['sStreamName'] +
