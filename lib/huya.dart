@@ -37,12 +37,15 @@ Future<List> getLiveList(String url) async {
     var sAvatar180 = data['roomInfo']['tLiveInfo']['sAvatar180'];
     var sScreenshot = data['roomInfo']['tLiveInfo']['sScreenshot'];
     sScreenshot = sScreenshot.replaceAll('http', 'https');
+    sScreenshot = sScreenshot.replaceAll('httpss', 'https');
+    var lUid = data["roomInfo"]["tProfileInfo"]["lUid"];
     //add basic info
     returnList.add(1);
     returnList.add(sNick);
     returnList.add(sAvatar180);
     returnList.add(roomIntroduction);
     returnList.add(sScreenshot);
+    returnList.add(lUid);
     returnList.add(roomValue.length);
     //add cdn info
     for (var i = 0, len = roomValue.length; i < len; i++) {
@@ -74,7 +77,8 @@ Future<List> getLiveList(String url) async {
 2_avatar,
 3_title, 
 4_screenshot,
-5_length(cdn number), 
-6_cdnType,
-7_cdnUrl]
+5_uid,
+6_length(cdn number), 
+7_cdnType,
+8_cdnUrl]
 */
