@@ -14,5 +14,5 @@ A Flutter project can make you watch live with ease.
 
 ## Screenshots
 
-<img width="1280" alt="屏幕截图 2022-05-20 174238" src="https://user-images.githubusercontent.com/16839488/169522945-eeb5d2b7-019e-481c-8149-94f50d36ea4b.png">
-
+<img width="1280" alt="OLD-IMAGE" src="https://user-images.githubusercontent.com/16839488/169522945-eeb5d2b7-019e-481c-8149-94f50d36ea4b.png">
+<img width="1280" alt="CUR-IMAGE" src="https://user-images.githubusercontent.com/16839488/179977506-6b23baa2-50a8-4df5-85b3-5c80beaf1bc0.png">
