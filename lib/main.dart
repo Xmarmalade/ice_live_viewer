@@ -283,17 +283,17 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                           final roomName = (snapshot.data!
                                               as List<dynamic>)[3];
                                           final roomCdnLength = (snapshot.data!
-                                              as List<dynamic>)[5];
+                                              as List<dynamic>)[6];
                                           List<Widget> cdnListTiles = [];
                                           for (var i = 1;
                                               i <= roomCdnLength;
                                               i++) {
                                             cdnListTiles.add(ListTile(
                                               leading: Text((snapshot.data!
-                                                  as List<dynamic>)[i * 2 + 4]),
+                                                  as List<dynamic>)[i * 2 + 5]),
                                               subtitle: Text(
                                                 (snapshot.data! as List<
-                                                    dynamic>)[i * 2 + 5],
+                                                    dynamic>)[i * 2 + 6],
                                                 maxLines: 2,
                                               ),
                                               trailing: Row(
@@ -319,7 +319,7 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                       String rawLink = (snapshot
                                                                   .data!
                                                               as List<dynamic>)[
-                                                          i * 2 + 5];
+                                                          i * 2 + 6];
                                                       String hdLink =
                                                           rawLink.replaceAll(
                                                               'imgplus.flv',
@@ -357,6 +357,8 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                     icon: const Icon(
                                                         Icons.play_arrow),
                                                     onSelected: (context) {
+                                                      var lUid = (snapshot.data!
+                                                          as List<dynamic>)[5];
                                                       var roomSelectedUrl =
                                                           context;
                                                       Navigator.push(
@@ -368,13 +370,15 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                                                         roomName,
                                                                     url:
                                                                         roomSelectedUrl,
+                                                                    danmakuId:
+                                                                        lUid,
                                                                   )));
                                                     },
                                                     itemBuilder: (context) {
                                                       String rawLink = (snapshot
                                                                   .data!
                                                               as List<dynamic>)[
-                                                          i * 2 + 5];
+                                                          i * 2 + 6];
                                                       String hdLink =
                                                           rawLink.replaceAll(
                                                               'imgplus.flv',
