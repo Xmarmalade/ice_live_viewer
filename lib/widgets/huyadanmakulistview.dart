@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
-import 'tarscodec.dart';
+import '../utils/tarscodec.dart';
 
 class HuyaDanmakuListView extends StatefulWidget {
   const HuyaDanmakuListView({Key? key, required this.danmakuId})
@@ -88,11 +88,16 @@ class _HuyaDanmakuListViewState extends State<HuyaDanmakuListView>
 
   void addDanmaku(LiveDanmakuItem item) {
     if (_messageList.length > 100) {
-      _messageList.removeAt(0);
+      int leng = _messageList.length;
+      for (int i = 0; i < leng - 100; i++) {
+        _messageList.removeAt(0);
+      }
     }
-    setState(() {
-      _messageList.add(item);
-    });
+    if (mounted) {
+      setState(() {
+        _messageList.add(item);
+      });
+    }
   }
 
   @override
