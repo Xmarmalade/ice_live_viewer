@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:dart_vlc/dart_vlc.dart';
+import 'package:flutter/material.dart';
 import 'package:ice_live_viewer/pages/home.dart';
 import 'package:ice_live_viewer/utils/theme.dart';
 
 void main() {
-  DartVLC.initialize(useFlutterNativeView: true);
+  DartVLC.initialize(useFlutterNativeView: false);
   runApp(const MyApp());
 }
 
