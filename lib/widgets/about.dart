@@ -15,11 +15,12 @@ class About extends StatelessWidget {
               context: context,
               applicationName: 'IceLiveViewer',
               applicationVersion: 'beta v3',
-              applicationIcon: const Icon(
-                Icons.hexagon_rounded,
-                size: 64.0,
+              applicationIcon: SizedBox(
+                width: 60,
+                child: Center(
+                  child: Image.asset('assets/icon.png'),
+                ),
               ),
-              applicationLegalese: 'Copyright 2022',
               children: [
                 const Text('IceLiveViewer is a simple app to view streams.'),
                 const Text(

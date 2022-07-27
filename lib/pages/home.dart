@@ -96,9 +96,20 @@ class HomeDrawer extends StatelessWidget {
       child: ListView(
         children: <Widget>[
           DrawerHeader(
-            child: Center(
-                child: Text('IceLiveViewer',
-                    style: Theme.of(context).textTheme.headline1)),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 80,
+                  child: Center(
+                    child: Image.asset('assets/icon.png'),
+                  ),
+                ),
+                const Padding(padding: EdgeInsets.only(left: 10)),
+                Center(
+                    child: Text('IceLiveViewer',
+                        style: Theme.of(context).textTheme.headline1)),
+              ],
+            ),
           ),
           ListTile(
             title: const Text('Settings'),
@@ -106,7 +117,7 @@ class HomeDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SettingsPage()),
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
               );
             },
           ),
@@ -170,7 +181,7 @@ class HomeDrawer extends StatelessWidget {
               );
             },
           ),
-          About()
+          const About()
         ],
       ),
     );
@@ -222,7 +233,8 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                               if ((snapshotData as List<dynamic>)[0] == 0) {
                                 //NO
                                 return OfflineListTile(
-                                    anchor: (snapshotData)[1]);
+                                    anchor: (snapshotData)[1],
+                                    rawLink: listURL);
                               } else {
                                 //YES
                                 return ListTile(
@@ -235,13 +247,14 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
                                   trailing:
                                       const Icon(Icons.chevron_right_sharp),
                                   onTap: () {
-                                    showChosenDialog(context, snapshotData);
+                                    showChosenDialog(
+                                        context, snapshotData, listURL);
                                   },
                                 );
                               }
                             } else if (snapshot.hasError) {
-                              Object? snapshotError = snapshot.error;
-                              return ErrorListTile(error: snapshotError);
+                              return ErrorListTile(
+                                  error: snapshot.error, rawLink: listURL);
                             }
                             return const ListTile(
                               title: Text('Loading...'),
@@ -262,7 +275,7 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
   }
 
   Future<dynamic> showChosenDialog(
-      BuildContext context, List<dynamic> snapshotData) {
+      BuildContext context, List<dynamic> snapshotData, String rawLink) {
     return showDialog(
         context: context,
         builder: (context) {
@@ -392,7 +405,11 @@ class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
               TextButton(
                   child: const Text('Delete'),
                   onPressed: () {
-                    //TODO: delete the link
+                    storage.deleteSingleLink(rawLink);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const Home();
+                    }));
                   }),
               ElevatedButton(
                 child: const Text('Back'),
@@ -410,9 +427,11 @@ class OfflineListTile extends StatelessWidget {
   const OfflineListTile({
     Key? key,
     required this.anchor,
+    required this.rawLink,
   }) : super(key: key);
 
   final String anchor;
+  final String rawLink;
 
   @override
   Widget build(BuildContext context) {
@@ -435,7 +454,11 @@ class OfflineListTile extends StatelessWidget {
                   TextButton(
                       child: const Text('Delete'),
                       onPressed: () {
-                        //TODO: delete the link
+                        storage.deleteSingleLink(rawLink);
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return const Home();
+                        }));
                       }),
                 ],
               );
@@ -449,9 +472,11 @@ class ErrorListTile extends StatelessWidget {
   const ErrorListTile({
     Key? key,
     required this.error,
+    required this.rawLink,
   }) : super(key: key);
 
   final Object? error;
+  final String rawLink;
 
   @override
   Widget build(BuildContext context) {
@@ -477,7 +502,11 @@ class ErrorListTile extends StatelessWidget {
                     TextButton(
                         child: const Text('Delete'),
                         onPressed: () {
-                          //TODO: delete the link
+                          storage.deleteSingleLink(rawLink);
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return const Home();
+                          }));
                         })
                   ]);
             });

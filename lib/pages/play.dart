@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:dart_vlc/dart_vlc.dart';
-import 'package:ice_live_viewer/widgets/huyadanmakulistview.dart';
+import 'package:ice_live_viewer/widgets/huyadanmaku.dart';
 
 class StreamPlayer extends StatefulWidget {
   const StreamPlayer(
@@ -22,9 +22,16 @@ class _StreamPlayerState extends State<StreamPlayer> {
   Widget build(BuildContext context) {
     final ratio =
         MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
-    final streamPlayer = Player(id: 11, registerTexture: false);
+    final streamPlayer = Player(id: 11, registerTexture: true);
     final streamInfo = Media.network(widget.url);
     streamPlayer.open(streamInfo, autoStart: true);
+    final nativeVideo = Video(
+      player: streamPlayer,
+      showControls: true,
+    );
+    var huyaDanmakuListView = HuyaDanmakuListView(
+      danmakuId: widget.danmakuId,
+    );
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -36,21 +43,16 @@ class _StreamPlayerState extends State<StreamPlayer> {
           ),
           title: Text(widget.title),
         ),
-        body: ratio > 1
+        body: ratio > 1.2
             ? Row(
                 children: <Widget>[
                   Expanded(
                     flex: 4,
-                    child: NativeVideo(
-                      player: streamPlayer,
-                      showControls: true,
-                    ),
+                    child: nativeVideo,
                   ),
                   Expanded(
                     flex: 1,
-                    child: HuyaDanmakuListView(
-                      danmakuId: widget.danmakuId,
-                    ),
+                    child: huyaDanmakuListView,
                   ),
                 ],
               )
@@ -58,10 +60,7 @@ class _StreamPlayerState extends State<StreamPlayer> {
                 children: <Widget>[
                   Expanded(
                     flex: 3,
-                    child: NativeVideo(
-                      player: streamPlayer,
-                      showControls: true,
-                    ),
+                    child: nativeVideo,
                   ),
                   Expanded(
                     flex: 5,
