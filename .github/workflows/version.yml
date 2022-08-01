@@ -50,6 +50,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.yaml-data.outputs.data }}
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          draft: true
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             README.md
