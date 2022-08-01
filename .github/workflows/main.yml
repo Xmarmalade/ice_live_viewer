@@ -35,8 +35,15 @@ jobs:
       - name: Build
         run: |
           flutter config --enable-windows-desktop
+          flutter pub get
           flutter build windows
-          Compress-Archive -Path .\build\windows\runner\Release\* -DestinationPath ${{ env.APP_NAME }}-windows.zip
+    
+      - name: Archive Release
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'zip'
+          filename: IceLiveViewerX-${{github.ref_name}}-windows.zip
+          directory: build/windows/runner/Release
       
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -46,5 +53,4 @@ jobs:
           name: Release ${{ github.ref }}
           prerelease: true
           files: |
-            ${{ env.APP_NAME }}-windows.zip
-
+            build/windows/runner/Release/IceLiveViewerX-${{github.ref_name}}-windows.zip
