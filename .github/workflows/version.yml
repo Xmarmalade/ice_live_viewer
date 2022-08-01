@@ -46,16 +46,10 @@ jobs:
       - name: Display read-yaml output
         run: echo "${{ steps.yaml-data.outputs.data }}"
       
-      - name: GitHub Release
-        id: create_release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.yaml-data.outputs.data }}
-          release_name: v${{ steps.yaml-data.outputs.data }}
-          body: ${{ steps.yaml-data.outputs.data }}
-          draft: true
-          prerelease: true
-          files: | 
-            ./assets/icon.png
+          tag_name: ${{ steps.yaml-data.outputs.data }}
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          files: |
+            README.md
