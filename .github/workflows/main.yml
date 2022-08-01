@@ -12,16 +12,39 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  
+  
+env:
+  # APP name
+  APP_NAME: IceLiveViewer
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
- build:
-   runs-on: windows-latest
-   steps:
-     - uses: actions/checkout@v3
-     - uses: subosito/flutter-action@v2
-       with:
-          flutter-version: '3.0.5'
+  build-windows:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: subosito/flutter-action@v2
+        with:
           channel: 'stable'
-     - run: flutter config --enable-windows-desktop
-     - run: flutter build windows
+          
+      - name: Build
+        run: |
+          flutter config --enable-windows-desktop
+          flutter build windows
+          Compress-Archive -Path .\build\windows\runner\Release\* -DestinationPath ${{ env.APP_NAME }}-windows.zip
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref }}
+          name: Release ${{ github.ref }}
+          prerelease: true
+          files: |
+            ${{ env.APP_NAME }}-windows.zip
+
