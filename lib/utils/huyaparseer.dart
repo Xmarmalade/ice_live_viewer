@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
-/// This code is used to parse the live address
 Future<String> _getLiveHtml(String url) async {
   var resp = await http.get(
     Uri.parse(url),
@@ -36,7 +35,6 @@ Future<Map<String, dynamic>> getLiveInfo(String url) async {
   int eLiveStatus = data['roomInfo']['eLiveStatus'];
   String sNick = data['roomInfo']['tProfileInfo']['sNick'];
 
-  //check live status
   if (eLiveStatus == 2) {
     var roomValue = data['roomInfo']['tLiveInfo']['tLiveStreamInfo']
         ['vStreamInfo']['value'];
