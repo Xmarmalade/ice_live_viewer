@@ -10,6 +10,7 @@ class StreamPlayer extends StatefulWidget {
       required this.url,
       required this.danmakuId})
       : super(key: key);
+
   final String title;
   final String url;
   final int danmakuId;
