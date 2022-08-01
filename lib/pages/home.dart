@@ -1,11 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:ice_live_viewer/pages/play.dart';
 import 'package:ice_live_viewer/pages/settings.dart';
-import 'package:ice_live_viewer/widgets/about.dart';
-import 'package:ice_live_viewer/utils/huyaparseer.dart' as huya;
+import 'package:ice_live_viewer/utils/linkparser.dart';
 import 'package:ice_live_viewer/utils/storage.dart' as storage;
+import 'package:ice_live_viewer/widgets/about.dart';
+import 'package:ice_live_viewer/widgets/listtile.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -16,13 +15,14 @@ class Home extends StatelessWidget {
       appBar: AppBar(
         title: const Text('IceLiveViewer'),
       ),
-      body: const HuyaListFutureBuilder(),
+      body: const ListViewFutureBuilder(),
       drawer: const HomeDrawer(),
       floatingActionButton: const FloatingButton(),
     );
   }
 }
 
+/// 首页的悬浮按钮
 class FloatingButton extends StatelessWidget {
   const FloatingButton({Key? key}) : super(key: key);
   //create floating button
@@ -35,13 +35,13 @@ class FloatingButton extends StatelessWidget {
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            var linkTextController = TextEditingController();
+            TextEditingController linkTextController = TextEditingController();
             return AlertDialog(
               title: const Text('Enter the link'),
               content: TextField(
                 keyboardType: TextInputType.text,
                 decoration: const InputDecoration(
-                  labelText: 'Link',
+                  labelText: 'Enter link',
                   hintText: 'https://m.huya.com/243547',
                 ),
                 onChanged: (String value) {},
@@ -61,7 +61,8 @@ class FloatingButton extends StatelessWidget {
                     showDialog(
                         context: context,
                         builder: (context) {
-                          storage.saveSingleLink(linkTextController.text);
+                          storage.saveSingleLink(LinkParser()
+                              .standardizeUrl(linkTextController.text));
                           return AlertDialog(
                             title: const Text('Success'),
                             actions: [
@@ -87,6 +88,7 @@ class FloatingButton extends StatelessWidget {
   }
 }
 
+/// 首页的侧边栏
 class HomeDrawer extends StatelessWidget {
   const HomeDrawer({Key? key}) : super(key: key);
   //create the drawer
@@ -94,6 +96,7 @@ class HomeDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
+        primary: false,
         children: <Widget>[
           DrawerHeader(
             child: Row(
@@ -188,329 +191,62 @@ class HomeDrawer extends StatelessWidget {
   }
 }
 
-class HuyaListFutureBuilder extends StatefulWidget {
-  const HuyaListFutureBuilder({Key? key}) : super(key: key);
+/// 首页列表视图的骨架
+class ListViewFutureBuilder extends StatefulWidget {
+  const ListViewFutureBuilder({Key? key}) : super(key: key);
+
   @override
-  _HuyaListFutureBuilderState createState() => _HuyaListFutureBuilderState();
+  State<ListViewFutureBuilder> createState() => _ListViewFutureBuilderState();
 }
 
-class _HuyaListFutureBuilderState extends State<HuyaListFutureBuilder> {
+class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
   @override
   Widget build(BuildContext context) {
-    //create a future builder to get the data from storage
-    return FutureBuilder(
-        future: storage.getAllLinks(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                //reload the page
-                setState(() {});
-              },
-              child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context).copyWith(
-                    dragDevices: {
-                      //enable the drag on mouse and touch devices
-                      PointerDeviceKind.mouse,
-                      PointerDeviceKind.touch,
-                    },
-                  ),
-                  child: ListView.builder(
-                    itemCount: (snapshot.data as Map<String, dynamic>).length,
-                    itemBuilder: (context, index) {
-                      //get the key and value pairs number
-                      int indexNum = index + 1;
-                      String listURL =
-                          (snapshot.data as Map<String, dynamic>)['$indexNum']
-                              .toString();
-                      return FutureBuilder(
-                          future: huya.getLiveList(listURL),
-                          builder: (context, snapshot) {
-                            //Determine if the data is loaded or not
-                            if (snapshot.hasData) {
-                              Object? snapshotData = snapshot.data;
-                              //Determine whether the anchor is on or off
-                              if ((snapshotData as List<dynamic>)[0] == 0) {
-                                //NO
-                                return OfflineListTile(
-                                    anchor: (snapshotData)[1],
-                                    rawLink: listURL);
-                              } else {
-                                //YES
-                                return ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundImage:
-                                        NetworkImage((snapshotData)[2]),
-                                  ),
-                                  title: Text((snapshotData)[3]),
-                                  subtitle: Text((snapshotData)[1]),
-                                  trailing:
-                                      const Icon(Icons.chevron_right_sharp),
-                                  onTap: () {
-                                    showChosenDialog(
-                                        context, snapshotData, listURL);
-                                  },
-                                );
-                              }
-                            } else if (snapshot.hasError) {
-                              return ErrorListTile(
-                                  error: snapshot.error, rawLink: listURL);
-                            }
-                            return const ListTile(
-                              title: Text('Loading...'),
-                              subtitle: LinearProgressIndicator(),
-                            );
-                          });
-                    },
-                  )),
-            );
-          } else if (snapshot.hasError) {
-            return ListTile(
-              leading: const Icon(Icons.error_outline),
-              title: Text('${snapshot.error}'),
-            );
-          }
-          return const CircularProgressIndicator();
+    return RefreshIndicator(
+      onRefresh: () {
+        return storage.getAllLinks().then((value) {
+          setState(() {});
         });
-  }
-
-  Future<dynamic> showChosenDialog(
-      BuildContext context, List<dynamic> snapshotData, String rawLink) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          String roomName = (snapshotData)[3];
-          int roomCdnLength = (snapshotData)[6];
-          List<Widget> cdnListTiles = [];
-          for (var i = 1; i <= roomCdnLength; i++) {
-            cdnListTiles.add(ListTile(
-              leading: Text((snapshotData)[i * 2 + 5]),
-              subtitle: Text(
-                (snapshotData)[i * 2 + 6],
-                maxLines: 2,
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.copy),
-                    onSelected: (context) {
-                      Clipboard.setData(ClipboardData(text: context));
-                      //show a scaffold to show the copy success
-                      ScaffoldMessenger.of(this.context)
-                          .showSnackBar(const SnackBar(
-                              content: Text(
-                        'Copied to clipboard',
-                      )));
-                    },
-                    itemBuilder: (context) {
-                      String rawLink = (snapshotData)[i * 2 + 6];
-                      String hdLink =
-                          rawLink.replaceAll('imgplus.flv', 'imgplus_4000.flv');
-                      String sdLink =
-                          rawLink.replaceAll('imgplus.flv', 'imgplus_2000.flv');
-                      String saveDataLink =
-                          rawLink.replaceAll('imgplus.flv', 'imgplus_1500.flv');
-                      return <PopupMenuEntry<String>>[
-                        PopupMenuItem(
-                          value: hdLink,
-                          child: const Text('1080P'),
-                        ),
-                        PopupMenuItem(
-                          value: sdLink,
-                          child: const Text('720P'),
-                        ),
-                        PopupMenuItem(
-                          value: saveDataLink,
-                          child: const Text('540P'),
-                        ),
-                      ];
-                    },
-                  ),
-                  PopupMenuButton<String>(
-                    icon: const Icon(Icons.play_arrow),
-                    onSelected: (context) {
-                      int lUid = (snapshotData)[5];
-                      String roomSelectedUrl = context;
-                      Navigator.push(
-                          this.context,
-                          MaterialPageRoute(
-                              builder: (context) => StreamPlayer(
-                                    title: roomName,
-                                    url: roomSelectedUrl,
-                                    danmakuId: lUid,
-                                  )));
-                    },
-                    itemBuilder: (context) {
-                      String rawLink = (snapshotData)[i * 2 + 6];
-                      String hdLink =
-                          rawLink.replaceAll('imgplus.flv', 'imgplus_4000.flv');
-                      String sdLink =
-                          rawLink.replaceAll('imgplus.flv', 'imgplus_2000.flv');
-                      String saveDataLink =
-                          rawLink.replaceAll('imgplus.flv', 'imgplus_1500.flv');
-                      return <PopupMenuEntry<String>>[
-                        PopupMenuItem(
-                          value: hdLink,
-                          child: const Text('1080P'),
-                        ),
-                        PopupMenuItem(
-                          value: sdLink,
-                          child: const Text('720P'),
-                        ),
-                        PopupMenuItem(
-                          value: saveDataLink,
-                          child: const Text('540P'),
-                        ),
-                      ];
-                    },
-                  ),
-                ],
-              ),
-            ));
-          }
-          return AlertDialog(
-            scrollable: true,
-            title: Text((snapshotData)[3]),
-            content: SizedBox(
-              width: double.infinity,
-              child: Column(
-                children: <Widget>[
-                  //show network image of cover
-                  Image.network((snapshotData)[4],
-                      //show loading progress
-                      height: 200, errorBuilder: (context, child, error) {
-                    return const SizedBox(
-                      height: 200,
-                      child: Center(
-                        child: Text('Error loading image'),
-                      ),
-                    );
-                  }, loadingBuilder: (context, child, progress) {
-                    return progress == null
-                        ? child
-                        : const SizedBox(
-                            height: 200,
-                            child: Center(child: CircularProgressIndicator()));
-                  }),
-                  //gridview to show the links and copy button
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: cdnListTiles,
-                  )
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                  child: const Text('Delete'),
-                  onPressed: () {
-                    storage.deleteSingleLink(rawLink);
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const Home();
-                    }));
-                  }),
-              ElevatedButton(
-                child: const Text('Back'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        });
-  }
-}
-
-class OfflineListTile extends StatelessWidget {
-  const OfflineListTile({
-    Key? key,
-    required this.anchor,
-    required this.rawLink,
-  }) : super(key: key);
-
-  final String anchor;
-  final String rawLink;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(
-        Icons.tv_off_rounded,
-        size: 40.0,
-        color: Color.fromARGB(255, 255, 112, 112),
-      ),
-      title: const Text('Disconnected'),
-      subtitle: Text(anchor),
-      trailing: const Icon(Icons.chevron_right_sharp),
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: const Text('Offline'),
-                actions: [
-                  TextButton(
-                      child: const Text('Delete'),
-                      onPressed: () {
-                        storage.deleteSingleLink(rawLink);
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return const Home();
-                        }));
-                      }),
-                ],
+      },
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(
+          dragDevices: {
+            //enable the drag on mouse and touch devices
+            PointerDeviceKind.mouse,
+            PointerDeviceKind.touch,
+          },
+        ),
+        child: FutureBuilder(
+          future: storage.getAllLinks(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return ListTile(
+                leading: const Icon(Icons.error_outline),
+                title: Text('Error:Storage Error${snapshot.error}'),
               );
-            });
-      },
-    );
-  }
-}
-
-class ErrorListTile extends StatelessWidget {
-  const ErrorListTile({
-    Key? key,
-    required this.error,
-    required this.rawLink,
-  }) : super(key: key);
-
-  final Object? error;
-  final String rawLink;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(
-        Icons.tv_off_sharp,
-        size: 40.0,
-        color: Color.fromARGB(255, 255, 112, 112),
+            } else if (snapshot.hasData) {
+              final Object? links = snapshot.data;
+              return ListView.builder(
+                itemCount: (links as Map<String, dynamic>).length,
+                itemBuilder: (context, index) {
+                  int indexNum = index + 1;
+                  String url = (links)['$indexNum'].toString();
+                  String type = LinkParser().checkType(url);
+                  if (type == 'huya') {
+                    return HuyaFutureListTileSkeleton(url: url);
+                  } else if (type == 'bilibili') {
+                    return BilibiliFutureListTileSkeleton(url: url);
+                  } else {
+                    return ErrorListTile(error: type, rawLink: url);
+                  }
+                },
+              );
+            } else {
+              return const LinearProgressIndicator();
+            }
+          },
+        ),
       ),
-      title: const Text('Error'),
-      subtitle: const Text(
-          'For specific reasons, we do not have access to this live room'),
-      trailing: const Icon(Icons.chevron_right_sharp),
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                  title: Text('$error'),
-                  content: const Text(
-                      'For specific reasons, we do not have access to this live room. Please check whether this live room can be accessed normally, if not, please submit the error message above.'),
-                  actions: <Widget>[
-                    TextButton(
-                        child: const Text('Delete'),
-                        onPressed: () {
-                          storage.deleteSingleLink(rawLink);
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                            return const Home();
-                          }));
-                        })
-                  ]);
-            });
-      },
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
+//import 'dart:convert';
 
 //create a function to get all the data and store every value into a map
 Future<Map<String, dynamic>> getAllData() async {
@@ -18,12 +18,15 @@ Future<bool> clearData() async {
   return prefs.clear();
 }
 
+/// 获取所有链接 返回Map{index: link}
+///
+/// 如果是首次使用则会初始化
 Future<Map<String, String>> getAllLinks() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   List<String>? linksList = prefs.getStringList('links');
   Map<String, String> linksMap = {};
   if (linksList == null) {
-    init();
+    initStorage();
   }
   for (int i = 1; i <= (linksList!.length); i++) {
     linksMap[i.toString()] = linksList[i - 1];
@@ -47,7 +50,7 @@ Future<bool> deleteSingleLink(String key) async {
   return prefs.setStringList('links', linksList);
 }
 
-Future<bool> init() async {
+Future<bool> initStorage() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   List<String>? linksList = prefs.getStringList('links');
   if (linksList == null) {
@@ -58,14 +61,11 @@ Future<bool> init() async {
   return false;
 }
 
-
-
 /* //create a function to read all the key number
 Future<int> getKeyNumber() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getKeys().length;
 } */
-
 
 /* //create a function to save the data
 Future<bool> saveData(String key, String value) async {
