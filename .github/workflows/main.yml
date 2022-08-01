@@ -7,8 +7,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  # pull_request:
+    # branches: [ "master" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -32,6 +32,13 @@ jobs:
         with:
           channel: 'stable'
           
+      - name: Run read-yaml action
+        id: yaml-data
+        uses: KJ002/read-yaml@main
+        with:
+          file: './pubspec.yaml'
+          key-path: '["version"]' 
+          
       - name: Build
         run: |
           flutter config --enable-windows-desktop
@@ -42,15 +49,19 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: IceLiveViewerX-${{github.ref_name}}-windows.zip
+          filename: IceLiveViewer-${{github.ref_name}}-${{steps.yaml-data.outputs.data}}-windows.zip
           directory: build/windows/runner/Release
       
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: GitHub Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref }}
+          tag_name: v${{steps.yaml-data.outputs.data}}
+          release_name: v${{steps.yaml-data.outputs.data}}
+          body: ""
+          draft: true
           prerelease: true
-          files: |
-            build/windows/runner/Release/IceLiveViewerX-${{github.ref_name}}-windows.zip
+          files: | 
+            build/windows/runner/Release/IceLiveViewer-${{github.ref_name}}-${{steps.yaml-data.outputs.data}}-windows.zip
