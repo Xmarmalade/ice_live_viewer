@@ -55,7 +55,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.yaml-data.outputs.data }}
+          tag_name: v${{ steps.yaml-data.outputs.data }}
           draft: true
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
