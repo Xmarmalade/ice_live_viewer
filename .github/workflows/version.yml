@@ -34,6 +34,9 @@ jobs:
       - name: Display read-yaml output
         run: echo "${{ steps.yaml-data.outputs.data }}"
       
+      - name: Run 
+        run: echo "${{ github.ref }}"
+
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -44,3 +47,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             README.md
+            pubspec.yaml
