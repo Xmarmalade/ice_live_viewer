@@ -2,10 +2,8 @@ import 'dart:convert';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
-//This code is used to parse the live address
-
+/// This code is used to parse the live address
 Future<String> _getLiveHtml(String url) async {
-  //get html from url
   var resp = await http.get(
     Uri.parse(url),
     headers: {
@@ -16,18 +14,27 @@ Future<String> _getLiveHtml(String url) async {
   return resp.body;
 }
 
-Future<List> getLiveList(String url) async {
-  List returnList = [];
-  String value;
-  value = await _getLiveHtml(url);
+///接收url 返回直播信息
+///
+///liveStatus:直播状态 0未开播 1直播
+///name:名字
+///avatar:头像
+///title:直播标题
+///cover:直播封面
+///luid:主播id 弹幕
+///cdnCount:cdn数量
+///linkList:直播链接列表[CDN-链接]
+Future<Map<String, dynamic>> getLiveInfo(String url) async {
+  Map<String, dynamic> liveInfo = {};
+  List<String> returnLinkList = [];
+  String value = await _getLiveHtml(url);
   var dataLive = parse(value);
   var body = dataLive.getElementsByTagName('body')[0];
   var script = body.getElementsByTagName('script')[3];
-  //replace 'window.HNF_GLOBAL_INIT = ' in script.text
-  var json = script.text.replaceAll('window.HNF_GLOBAL_INIT = ', '');
+  String json = script.text.replaceAll('window.HNF_GLOBAL_INIT = ', '');
   var data = jsonDecode(json);
-  var eLiveStatus = data['roomInfo']['eLiveStatus'];
-  var sNick = data['roomInfo']['tProfileInfo']['sNick'];
+  int eLiveStatus = data['roomInfo']['eLiveStatus'];
+  String sNick = data['roomInfo']['tProfileInfo']['sNick'];
 
   //check live status
   if (eLiveStatus == 2) {
@@ -40,21 +47,21 @@ Future<List> getLiveList(String url) async {
     sScreenshot = sScreenshot.replaceAll('httpss', 'https');
     var lUid = data["roomInfo"]["tProfileInfo"]["lUid"];
     //add basic info
-    returnList.add(1);
-    returnList.add(sNick);
-    returnList.add(sAvatar180);
-    returnList.add(roomIntroduction);
-    returnList.add(sScreenshot);
-    returnList.add(lUid);
-    returnList.add(roomValue.length);
+    liveInfo['liveStatus'] = 1;
+    liveInfo['name'] = sNick;
+    liveInfo['avatar'] = sAvatar180;
+    liveInfo['title'] = roomIntroduction;
+    liveInfo['cover'] = sScreenshot;
+    liveInfo['luid'] = lUid;
+    liveInfo['cdnCount'] = roomValue.length;
     //add cdn info
     for (var i = 0, len = roomValue.length; i < len; i++) {
       var cdnType = (roomValue[i]['sCdnType']);
       var cdnHttpUrl = data['roomInfo']['tLiveInfo']["tLiveStreamInfo"]
           ["vStreamInfo"]["value"][i]["sFlvUrl"];
       var cdnHttpsUrl = cdnHttpUrl.replaceAll('http', 'https');
-      returnList.add(cdnType);
-      returnList.add(cdnHttpsUrl +
+      returnLinkList.add(cdnType);
+      returnLinkList.add(cdnHttpsUrl +
           '/' +
           data['roomInfo']['tLiveInfo']["tLiveStreamInfo"]["vStreamInfo"]
               ["value"][i]['sStreamName'] +
@@ -62,23 +69,12 @@ Future<List> getLiveList(String url) async {
           data['roomInfo']['tLiveInfo']["tLiveStreamInfo"]["vStreamInfo"]
               ["value"][i]['sFlvAntiCode']);
     }
+    liveInfo['linkList'] = returnLinkList;
   } else {
     //if not online
-    returnList.add(0);
-    returnList.add(sNick);
+    liveInfo['liveStatus'] = 0;
+    liveInfo['name'] = sNick;
   }
 
-  return returnList;
+  return liveInfo;
 }
-
-/*
-[0_0(off)_or_1(on), 
-1_name, 
-2_avatar,
-3_title, 
-4_screenshot,
-5_uid,
-6_length(cdn number), 
-7_cdnType,
-8_cdnUrl]
-*/
