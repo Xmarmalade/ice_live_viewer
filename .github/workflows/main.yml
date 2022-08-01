@@ -52,16 +52,12 @@ jobs:
           filename: IceLiveViewer-${{github.ref_name}}-${{steps.yaml-data.outputs.data}}-windows.zip
           directory: build/windows/runner/Release
       
-      - name: GitHub Release
-        id: create_release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{steps.yaml-data.outputs.data}}
-          release_name: v${{steps.yaml-data.outputs.data}}
-          body: ""
+          tag_name: ${{ steps.yaml-data.outputs.data }}
           draft: true
           prerelease: true
-          files: | 
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
             build/windows/runner/Release/IceLiveViewer-${{github.ref_name}}-${{steps.yaml-data.outputs.data}}-windows.zip
