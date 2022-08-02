@@ -379,17 +379,29 @@ class BilibiliOnlineListTile extends StatelessWidget {
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: const Text('Online'),
+                title: Text(liveInfo['title']),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text('Live Status: ${liveInfo['liveStatus']}'),
-                    Text('Title: ${liveInfo['title']}'),
-                    Text('Uname: ${liveInfo['uname']}'),
-                    Text('Avatar: ${liveInfo['avatar']}'),
-                    Text('Cover: ${liveInfo['cover']}'),
-                    Text('Keyframe: ${liveInfo['keyframe']}'),
-                    Text('Stream Link: ${streamLink['url']}'),
+                    Image.network(liveInfo['keyframe'],
+                        //show loading progress
+                        height: 200, errorBuilder: (context, child, error) {
+                      debugPrint(error.toString());
+                      return SizedBox(
+                        height: 200,
+                        child: Center(
+                          child: Text('Error loading image:$error.toString()'),
+                        ),
+                      );
+                    }, loadingBuilder: (context, child, progress) {
+                      return progress == null
+                          ? child
+                          : const SizedBox(
+                              height: 200,
+                              child:
+                                  Center(child: CircularProgressIndicator()));
+                    }),
+                    Text('Stream Link: ${streamLink['4']![0]}'),
                   ],
                 ),
                 actions: <Widget>[

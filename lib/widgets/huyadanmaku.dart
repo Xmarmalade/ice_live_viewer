@@ -87,8 +87,7 @@ class _HuyaDanmakuListViewState extends State<HuyaDanmakuListView>
 
   void addDanmaku(LiveDanmakuItem item) {
     if (_messageList.length > 100) {
-      int leng = _messageList.length;
-      for (int i = 0; i < leng - 100; i++) {
+      for (int i = 0; i < _messageList.length - 100; i++) {
         _messageList.removeAt(0);
       }
     }
