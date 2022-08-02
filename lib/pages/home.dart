@@ -250,7 +250,7 @@ class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
                 );
               }
               return ListView.builder(
-                itemCount: (links as Map<String, dynamic>).length,
+                itemCount: count,
                 itemBuilder: (context, index) {
                   int indexNum = index + 1;
                   String url = (links)['$indexNum'].toString();
