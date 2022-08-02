@@ -47,15 +47,15 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: IceLiveViewer-${{github.ref_name}}-${{steps.yaml-data.outputs.data}}-windows.zip
+          filename: IceLiveViewer-${{github.ref_name}}-windows.zip
           directory: build/windows/runner/Release
       
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.yaml-data.outputs.data }}
+          tag_name: ${{github.ref_name}}
           draft: true
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            build/windows/runner/Release/IceLiveViewer-${{github.ref_name}}-${{steps.yaml-data.outputs.data}}-windows.zip
+            build/windows/runner/Release/IceLiveViewer-${{github.ref_name}}-windows.zip
