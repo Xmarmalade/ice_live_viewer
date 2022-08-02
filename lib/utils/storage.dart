@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 //import 'dart:convert';
 
@@ -15,7 +16,8 @@ Future<Map<String, dynamic>> getAllData() async {
 ///create a function to clear all the data
 Future<bool> clearData() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.clear();
+  prefs.clear();
+  return initStorage();
 }
 
 /// 获取所有链接 返回Map{index: link}
@@ -38,8 +40,15 @@ Future<Map<String, String>> getAllLinks() async {
 Future<bool> saveSingleLink(String key) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   List<String>? linksList = prefs.getStringList('links');
-  linksList!.add(key);
-  return prefs.setStringList('links', linksList);
+  //check if the link is already in the list
+  if (linksList!.contains(key)) {
+    debugPrint('Link already exists');
+    return false;
+  } else {
+    linksList.add(key);
+    debugPrint('Link added$key');
+    return prefs.setStringList('links', linksList);
+  }
 }
 
 /// This function accepts a link as a string and deletes the specified link
