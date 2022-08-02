@@ -114,22 +114,16 @@ class _HuyaDanmakuListViewState extends State<HuyaDanmakuListView>
           if (_messageList[i] is LiveDanmakuItem) {
             LiveDanmakuItem liveDanmakuItem = _messageList[i];
             item = Container(
-              padding: const EdgeInsets.all(5),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    " ${liveDanmakuItem.name} :",
+                padding: const EdgeInsets.all(5),
+                child: Text.rich(TextSpan(children: [
+                  TextSpan(
+                    text: " ${liveDanmakuItem.name} :",
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
-                  Expanded(
-                    child: Text(
-                      " ${liveDanmakuItem.msg}",
-                    ),
-                  )
-                ],
-              ),
-            );
+                  TextSpan(
+                    text: " ${liveDanmakuItem.msg}",
+                  ),
+                ])));
           }
           return item;
         });

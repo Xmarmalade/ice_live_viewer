@@ -226,6 +226,29 @@ class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
               );
             } else if (snapshot.hasData) {
               final Object? links = snapshot.data;
+              int count = (links as Map<String, dynamic>).length;
+              debugPrint(snapshot.data.toString());
+              if (count == 0) {
+                return Center(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Icon(
+                          Icons.edit_note_rounded,
+                          size: 150,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                            'No data :(\n\nClick the button below \n to add your first link',
+                            style: Theme.of(context).textTheme.headline2,
+                            textAlign: TextAlign.center),
+                      ),
+                    ],
+                  ),
+                );
+              }
               return ListView.builder(
                 itemCount: (links as Map<String, dynamic>).length,
                 itemBuilder: (context, index) {

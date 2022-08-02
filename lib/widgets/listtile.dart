@@ -166,10 +166,12 @@ class HuyaOnlineListTile extends StatelessWidget {
                       Image.network(liveInfo['cover'],
                           //show loading progress
                           height: 200, errorBuilder: (context, child, error) {
-                        return const SizedBox(
+                        debugPrint(error.toString());
+                        return SizedBox(
                           height: 200,
                           child: Center(
-                            child: Text('Error loading image'),
+                            child:
+                                Text('Error loading image:$error.toString()'),
                           ),
                         );
                       }, loadingBuilder: (context, child, progress) {
@@ -283,9 +285,9 @@ class ErrorListTile extends StatelessWidget {
             context: context,
             builder: (context) {
               return AlertDialog(
-                  title: Text('$error'),
-                  content: const Text(
-                      'For specific reasons, we do not have access to this live room. Please check whether this live room can be accessed normally, if not, please submit the error message above.'),
+                  title: const Text(
+                      'For specific reasons, we do not have access to this live room. Please check whether this live room can be accessed normally, if not, please submit the error message below.'),
+                  content: Text('$error'),
                   actions: <Widget>[
                     TextButton(
                         child: const Text('Delete'),
