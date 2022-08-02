@@ -201,6 +201,14 @@ class ListViewFutureBuilder extends StatefulWidget {
 
 class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
   @override
+  void initState() {
+    super.initState();
+    storage.initStorage().then((_) {
+      setState(() {});
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () {
