@@ -374,7 +374,44 @@ class BilibiliOnlineListTile extends StatelessWidget {
       title: Text(liveInfo['title']),
       subtitle: Text(liveInfo['uname']),
       trailing: const Icon(Icons.chevron_right_sharp),
-      onTap: () {},
+      onTap: () {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Online'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text('Live Status: ${liveInfo['liveStatus']}'),
+                    Text('Title: ${liveInfo['title']}'),
+                    Text('Uname: ${liveInfo['uname']}'),
+                    Text('Avatar: ${liveInfo['avatar']}'),
+                    Text('Cover: ${liveInfo['cover']}'),
+                    Text('Keyframe: ${liveInfo['keyframe']}'),
+                    Text('Stream Link: ${streamLink['url']}'),
+                  ],
+                ),
+                actions: <Widget>[
+                  TextButton(
+                      child: const Text('Delete'),
+                      onPressed: () {
+                        storage.deleteSingleLink(rawLink);
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return const Home();
+                        }));
+                      }),
+                  ElevatedButton(
+                    child: const Text('Back'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+            });
+      },
     );
   }
 }
