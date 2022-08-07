@@ -24,8 +24,20 @@ class HuyaFutureListTileSkeleton extends StatelessWidget {
         if (snapshot.hasData) {
           Map<String, dynamic> liveInfo =
               (snapshot.data as Map<String, dynamic>);
-          if (liveInfo['liveStatus'] == 0) {
-            return OfflineListTile(anchor: liveInfo['name'], rawLink: url);
+          if (liveInfo['liveStatus'] == "0") {
+            return OfflineListTile(
+              anchor: liveInfo['name'],
+              rawLink: url,
+              avatar: liveInfo['avatar'],
+              title: liveInfo['title'],
+            );
+          } else if (liveInfo['liveStatus'] == "2") {
+            return OfflineListTile(
+              anchor: liveInfo['name'],
+              rawLink: url,
+              avatar: liveInfo['avatar'],
+              title: liveInfo['title'],
+            );
           } else {
             return HuyaOnlineListTile(
                 rawLink: url, context: context, liveInfo: liveInfo);
@@ -69,12 +81,12 @@ class HuyaOnlineListTile extends StatelessWidget {
             builder: (context) {
               String title = liveInfo['title'];
               int lUid = liveInfo['luid'];
-              List<String> linkList = liveInfo['linkList'];
-              int cdnCount = liveInfo['cdnCount'];
+              Map linkList = liveInfo['linkList'];
               List<Widget> cdnListTiles = [];
-              for (var i = 1; i <= cdnCount; i++) {
-                String cdnName = linkList[i * 2 - 2];
-                String cdnLink = linkList[i * 2 - 1];
+              for (String cdn in linkList.keys) {
+                String cdnName = cdn;
+                Map cdnLinkMap = linkList[cdn];
+                String cdnLink = cdnLinkMap['原画'];
                 String fhdLink =
                     cdnLink.replaceAll('imgplus.flv', 'imgplus_4000.flv');
                 String hdLink =
@@ -218,20 +230,22 @@ class OfflineListTile extends StatelessWidget {
     Key? key,
     required this.anchor,
     required this.rawLink,
+    required this.title,
+    required this.avatar,
   }) : super(key: key);
 
   final String anchor;
   final String rawLink;
+  final String title;
+  final String avatar;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const Icon(
-        Icons.tv_off_rounded,
-        size: 40.0,
-        color: Color.fromARGB(255, 255, 112, 112),
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(avatar),
       ),
-      title: const Text('Disconnected'),
+      title: Text(title == '' ? 'Disconnected' : 'Disconnected - $title'),
       subtitle: Text(anchor),
       trailing: const Icon(Icons.chevron_right_sharp),
       onTap: () {
@@ -322,9 +336,19 @@ class BilibiliFutureListTileSkeleton extends StatelessWidget {
         if (snapshot.hasData) {
           Map<String, dynamic> liveInfo = (snapshot.data as Map)['liveInfo'];
           if (liveInfo['liveStatus'] == '0') {
-            return OfflineListTile(anchor: liveInfo['uname'], rawLink: url);
+            return OfflineListTile(
+              anchor: liveInfo['uname'],
+              rawLink: url,
+              avatar: liveInfo['avatar'],
+              title: '',
+            );
           } else if (liveInfo['liveStatus'] == '2') {
-            return OfflineListTile(anchor: liveInfo['uname'], rawLink: url);
+            return OfflineListTile(
+              anchor: liveInfo['uname'],
+              rawLink: url,
+              avatar: liveInfo['avatar'],
+              title: '',
+            );
           } else {
             Map<String, List> streamLink = (snapshot.data as Map)['streamLink'];
             return BilibiliOnlineListTile(

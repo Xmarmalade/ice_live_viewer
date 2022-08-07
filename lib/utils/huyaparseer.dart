@@ -1,6 +1,13 @@
 import 'dart:convert';
+
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
+
+void main() {
+  getLiveInfo('243547').then((value) {
+    print(value);
+  });
+}
 
 Future<String> _getLiveHtml(String url) async {
   var resp = await http.get(
@@ -11,6 +18,31 @@ Future<String> _getLiveHtml(String url) async {
     },
   );
   return resp.body;
+}
+
+Future<Map<String, dynamic>> _getFromHuyaApi(String roomId) async {
+  var resp = await http.get(
+    Uri.parse(
+        'https://mp.huya.com/cache.php?m=Live&do=profileRoom&roomid=$roomId'),
+    headers: {
+      'User-Agent':
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+    },
+  );
+  var json = jsonDecode(resp.body);
+  return json['data'];
+}
+
+Future<Map<String, dynamic>> _getFromUnofficialApi(
+    String api, String roomId) async {
+  var resp = await http.get(
+    Uri.parse('$api/$roomId'),
+    headers: {
+      'User-Agent':
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+    },
+  );
+  return json.decode(resp.body)['data'];
 }
 
 ///接收url 返回直播信息
@@ -24,55 +56,101 @@ Future<String> _getLiveHtml(String url) async {
 ///cdnCount:cdn数量
 ///linkList:直播链接列表[CDN-链接]
 Future<Map<String, dynamic>> getLiveInfo(String url) async {
-  Map<String, dynamic> liveInfo = {};
-  List<String> returnLinkList = [];
-  String value = await _getLiveHtml(url);
+  String roomId = getRoomId(url);
+  if (int.tryParse(roomId) == null) {
+    roomId = await fixRoomId(roomId);
+  }
+  Map roomInfo = await _getFromHuyaApi(roomId);
+  String liveStatus = roomInfo['liveStatus'];
+  String name = roomInfo['profileInfo']['nick'];
+  String avatar = roomInfo['profileInfo']['avatar180'];
+  String title = roomInfo['liveData']['introduction'];
+
+  if (liveStatus == 'OFF') {
+    return {
+      'liveStatus': '0',
+      'name': name,
+      'avatar': avatar,
+      'title': title,
+    };
+  } else if (liveStatus == 'REPLAY') {
+    return {
+      'liveStatus': '2',
+      'name': name,
+      'avatar': avatar,
+      'title': title,
+    };
+  } else {
+    int lUid = roomInfo['profileInfo']['uid'];
+    String cover = roomInfo['liveData']['screenshot'];
+    Map streamDict = roomInfo['stream']['flv'];
+    List multiLine = streamDict['multiLine'];
+    List rateArray = streamDict['rateArray'];
+    Map supportResolutions = {};
+    Map finalLinks = {};
+    for (Map resolutions in rateArray) {
+      String bitrate = resolutions['iBitRate'].toString();
+      supportResolutions[resolutions['sDisplayName']] = '_$bitrate';
+    }
+    for (Map item in multiLine) {
+      String url = item['url'];
+      String cdnType = item['cdnType'];
+      Map cdnLinks = {};
+      cdnLinks['原画'] = url;
+      for (String resolution in supportResolutions.keys) {
+        String key = supportResolutions[resolution];
+        String tempUrl = url.replaceAll('imgplus.flv', 'imgplus$key.flv');
+        cdnLinks[resolution] = tempUrl;
+      }
+      finalLinks[cdnType] = cdnLinks;
+    }
+    print({
+      'name': name,
+      'title': title,
+      'liveStatus': '1',
+      'avatar': avatar,
+      'cover': cover,
+      'luid': lUid,
+      'cdnCount': finalLinks.length,
+      'linkList': finalLinks,
+    });
+    return {
+      'name': name,
+      'title': title,
+      'liveStatus': '1',
+      'avatar': avatar,
+      'cover': cover,
+      'luid': lUid,
+      'cdnCount': finalLinks.length,
+      'linkList': finalLinks,
+    };
+  }
+}
+
+Future<String> fixRoomId(String notDigitRoomId) async {
+  var resp = await http.get(
+    Uri.parse('https://m.huya.com/$notDigitRoomId'),
+    headers: {
+      'User-Agent':
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
+    },
+  );
+  String value = resp.body;
   var dataLive = parse(value);
   var body = dataLive.getElementsByTagName('body')[0];
+  print(body.getElementsByTagName('script'));
   var script = body.getElementsByTagName('script')[3];
   String json = script.text.replaceAll('window.HNF_GLOBAL_INIT = ', '');
-  var data = jsonDecode(json);
-  int eLiveStatus = data['roomInfo']['eLiveStatus'];
-  String sNick = data['roomInfo']['tProfileInfo']['sNick'];
+  return jsonDecode(json)['roomInfo']['tProfileInfo']['lProfileRoom']
+      .toString();
+}
 
-  if (eLiveStatus == 2) {
-    var roomValue = data['roomInfo']['tLiveInfo']['tLiveStreamInfo']
-        ['vStreamInfo']['value'];
-    var roomIntroduction = data['roomInfo']['tLiveInfo']['sIntroduction'];
-    var sAvatar180 = data['roomInfo']['tLiveInfo']['sAvatar180'];
-    var sScreenshot = data['roomInfo']['tLiveInfo']['sScreenshot'];
-    sScreenshot = sScreenshot.replaceAll('http', 'https');
-    sScreenshot = sScreenshot.replaceAll('httpss', 'https');
-    var lUid = data["roomInfo"]["tProfileInfo"]["lUid"];
-    //add basic info
-    liveInfo['liveStatus'] = 1;
-    liveInfo['name'] = sNick;
-    liveInfo['avatar'] = sAvatar180;
-    liveInfo['title'] = roomIntroduction;
-    liveInfo['cover'] = sScreenshot;
-    liveInfo['luid'] = lUid;
-    liveInfo['cdnCount'] = roomValue.length;
-    //add cdn info
-    for (var i = 0, len = roomValue.length; i < len; i++) {
-      var cdnType = (roomValue[i]['sCdnType']);
-      var cdnHttpUrl = data['roomInfo']['tLiveInfo']["tLiveStreamInfo"]
-          ["vStreamInfo"]["value"][i]["sFlvUrl"];
-      var cdnHttpsUrl = cdnHttpUrl.replaceAll('http', 'https');
-      returnLinkList.add(cdnType);
-      returnLinkList.add(cdnHttpsUrl +
-          '/' +
-          data['roomInfo']['tLiveInfo']["tLiveStreamInfo"]["vStreamInfo"]
-              ["value"][i]['sStreamName'] +
-          '.flv?' +
-          data['roomInfo']['tLiveInfo']["tLiveStreamInfo"]["vStreamInfo"]
-              ["value"][i]['sFlvAntiCode']);
+String getRoomId(String url) {
+  String path = url.split("/").last;
+  for (var i = 0; i < path.length; i++) {
+    if (path[i] == "?") {
+      return path.substring(0, i);
     }
-    liveInfo['linkList'] = returnLinkList;
-  } else {
-    //if not online
-    liveInfo['liveStatus'] = 0;
-    liveInfo['name'] = sNick;
   }
-
-  return liveInfo;
+  return path;
 }
