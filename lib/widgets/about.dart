@@ -14,7 +14,7 @@ class About extends StatelessWidget {
           showAboutDialog(
               context: context,
               applicationName: 'IceLiveViewer',
-              applicationVersion: '0.1.6-beta2',
+              applicationVersion: '0.1.7-beta1',
               applicationIcon: SizedBox(
                 width: 60,
                 child: Center(
