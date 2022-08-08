@@ -68,7 +68,7 @@ class _HuyaDanmakuListViewState extends State<HuyaDanmakuListView>
   void login() {
     Uint8List regData = regDataEncode(widget.danmakuId);
     _channel!.sink.add(regData);
-    //print("login");
+    debugPrint("login");
     Uint8List heartbeat = huyaWsHeartbeat();
     //print("heartbeat");
     _channel!.sink.add(heartbeat);

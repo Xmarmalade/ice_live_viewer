@@ -1,10 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:ice_live_viewer/pages/help.dart';
 import 'package:ice_live_viewer/pages/settings.dart';
 import 'package:ice_live_viewer/utils/linkparser.dart';
 import 'package:ice_live_viewer/utils/storage.dart' as storage;
 import 'package:ice_live_viewer/widgets/about.dart';
-import 'package:ice_live_viewer/widgets/listtile.dart';
+import 'package:ice_live_viewer/widgets/platformlisttile.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -181,6 +182,16 @@ class HomeDrawer extends StatelessWidget {
                     ],
                   );
                 },
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('Help'),
+            leading: const Icon(Icons.help_outline_outlined),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HelpPage()),
               );
             },
           ),

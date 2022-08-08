@@ -59,7 +59,7 @@ Future<Map<String, String>> getLiveInfo(String roomId) async {
 /// 返回画质-链接列表{'4': [主线，备线，备线，备线],'3': [主线，备线，备线，备线]}
 Future<Map<String, List>> getStreamLink(String roomId) async {
   String defaultStreamUrl =
-      'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=22603245&platform=web&otype=json&quality=4';
+      'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=$roomId&platform=h5&otype=json&quality=4';
   dynamic streamJson = await _getJson(defaultStreamUrl);
   List<dynamic> acceptQuality = streamJson['data']['accept_quality'];
   Map<String, List> streamMap = {};
@@ -75,7 +75,7 @@ Future<Map<String, List>> getStreamLink(String roomId) async {
     for (String qualityOption in acceptQuality) {
       if (qualityOption != '4') {
         String candidateStreamUrl =
-            'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=22603245&platform=web&otype=json&quality=$qualityOption';
+            'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=$roomId&platform=h5&otype=json&quality=$qualityOption';
         dynamic otherStreamJson = await _getJson(candidateStreamUrl);
         List<dynamic> otherStreamList = otherStreamJson['data']['durl'];
         List<String> otherStreamListUrl = [];
@@ -114,5 +114,125 @@ Future<Map<String, Map<String, dynamic>>> getLiveInfoAndStreamLink(
     return {
       'liveInfo': liveInfo,
     };
+  }
+}
+
+Future<BiliBiliHostServerConfig?> getBServerHost(String roomId) async {
+  String url = "https://api.live.bilibili.com/room/v1/Danmu/getConf?id=$roomId";
+  try {
+    var resp = await http.get(
+      Uri.parse(url),
+    );
+    var respData = jsonDecode(const Utf8Codec().decode(resp.bodyBytes));
+    if (respData["data"] != null) {
+      return BiliBiliHostServerConfig.fromJson(respData["data"]);
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+class BiliBiliHostServerConfig {
+  double? refreshRowFactor;
+  int? refreshRate;
+  int? maxDelay;
+  int? port;
+  String? host;
+  List<HostServerList>? hostServerList;
+  List<ServerList>? serverList;
+  String? token;
+
+  BiliBiliHostServerConfig(
+      {this.refreshRowFactor,
+      this.refreshRate,
+      this.maxDelay,
+      this.port,
+      this.host,
+      this.hostServerList,
+      this.serverList,
+      this.token});
+
+  BiliBiliHostServerConfig.fromJson(Map<String, dynamic> json) {
+    refreshRowFactor = json['refresh_row_factor'];
+    refreshRate = json['refresh_rate'];
+    maxDelay = json['max_delay'];
+    port = json['port'];
+    host = json['host'];
+    if (json['host_server_list'] != null) {
+      hostServerList = [];
+      json['host_server_list'].forEach((v) {
+        hostServerList!.add(HostServerList.fromJson(v));
+      });
+    }
+    if (json['server_list'] != null) {
+      serverList = [];
+      json['server_list'].forEach((v) {
+        serverList!.add(ServerList.fromJson(v));
+      });
+    }
+    token = json['token'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['refresh_row_factor'] = refreshRowFactor;
+    data['refresh_rate'] = refreshRate;
+    data['max_delay'] = maxDelay;
+    data['port'] = port;
+    data['host'] = host;
+    if (hostServerList != null) {
+      data['host_server_list'] =
+          hostServerList!.map((v) => v.toJson()).toList();
+    }
+    if (serverList != null) {
+      data['server_list'] = serverList!.map((v) => v.toJson()).toList();
+    }
+    data['token'] = token;
+    return data;
+  }
+}
+
+class HostServerList {
+  String? host;
+  int? port;
+  int? wssPort;
+  int? wsPort;
+
+  HostServerList({this.host, this.port, this.wssPort, this.wsPort});
+
+  HostServerList.fromJson(Map<String, dynamic> json) {
+    host = json['host'];
+    port = json['port'];
+    wssPort = json['wss_port'];
+    wsPort = json['ws_port'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['host'] = host;
+    data['port'] = port;
+    data['wss_port'] = wssPort;
+    data['ws_port'] = wsPort;
+    return data;
+  }
+}
+
+class ServerList {
+  String? host;
+  int? port;
+
+  ServerList({this.host, this.port});
+
+  ServerList.fromJson(Map<String, dynamic> json) {
+    host = json['host'];
+    port = json['port'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['host'] = host;
+    data['port'] = port;
+    return data;
   }
 }
