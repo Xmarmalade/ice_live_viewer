@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:ice_live_viewer/widgets/huyadanmaku.dart';
+import 'package:ice_live_viewer/widgets/bilibilianmaku.dart';
 
 class PureDanmaku extends StatelessWidget {
-  const PureDanmaku({Key? key, required this.title, required this.danmakuId})
+  const PureDanmaku(
+      {Key? key,
+      required this.title,
+      required this.danmakuId,
+      required this.type})
       : super(key: key);
 
   final String title;
+  final String type;
   final int danmakuId;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,9 +25,13 @@ class PureDanmaku extends StatelessWidget {
         ),
         title: Text(title),
       ),
-      body: HuyaDanmakuListView(
-        danmakuId: danmakuId,
-      ),
+      body: type == 'bilibili'
+          ? BilibiliDanmakuListView(roomId: danmakuId)
+          : (type == 'huya'
+              ? HuyaDanmakuListView(
+                  danmakuId: danmakuId,
+                )
+              : const Text('error')),
     );
   }
 }

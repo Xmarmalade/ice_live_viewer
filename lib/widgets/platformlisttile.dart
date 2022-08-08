@@ -144,6 +144,7 @@ class HuyaOnlineListTile extends StatelessWidget {
                                         title: title,
                                         url: roomSelectedUrl,
                                         danmakuId: lUid,
+                                        type: 'huya',
                                       )));
                         },
                         itemBuilder: (context) {
@@ -151,7 +152,7 @@ class HuyaOnlineListTile extends StatelessWidget {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.text_fields),
+                        icon: const Icon(Icons.comment_outlined),
                         tooltip: 'Only danmaku',
                         onPressed: () {
                           Navigator.push(
@@ -160,6 +161,7 @@ class HuyaOnlineListTile extends StatelessWidget {
                                   builder: (context) => PureDanmaku(
                                         title: title,
                                         danmakuId: lUid,
+                                        type: 'huya',
                                       )));
                         },
                       )
@@ -230,13 +232,13 @@ class OfflineListTile extends StatelessWidget {
     Key? key,
     required this.anchor,
     required this.rawLink,
-    required this.title,
+    this.title = '',
     required this.avatar,
   }) : super(key: key);
 
   final String anchor;
   final String rawLink;
-  final String title;
+  final String? title;
   final String avatar;
 
   @override
@@ -340,17 +342,16 @@ class BilibiliFutureListTileSkeleton extends StatelessWidget {
               anchor: liveInfo['uname'],
               rawLink: url,
               avatar: liveInfo['avatar'],
-              title: '',
             );
           } else if (liveInfo['liveStatus'] == '2') {
             return OfflineListTile(
               anchor: liveInfo['uname'],
               rawLink: url,
               avatar: liveInfo['avatar'],
-              title: '',
             );
           } else {
             Map<String, List> streamLink = (snapshot.data as Map)['streamLink'];
+            liveInfo['roomId'] = roomId;
             return BilibiliOnlineListTile(
                 context: context,
                 rawLink: url,
@@ -399,9 +400,76 @@ class BilibiliOnlineListTile extends StatelessWidget {
       subtitle: Text(liveInfo['uname']),
       trailing: const Icon(Icons.chevron_right_sharp),
       onTap: () {
+        debugPrint(streamLink.toString());
         showDialog(
             context: context,
             builder: (context) {
+              List<Widget> resolutionListTiles = [];
+              for (String resolution in streamLink.keys) {
+                String resolutionHint = resolution == '4'
+                    ? '原画'
+                    : (resolution == '3' ? '超清' : '高清');
+                resolutionListTiles.add(ListTile(
+                  leading: Text(resolutionHint),
+                  subtitle: Text(
+                    streamLink[resolution]![0] as String,
+                    maxLines: 2,
+                  ),
+                  trailing: Row(
+                    //TODO:添加播放按钮
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.play_arrow),
+                        tooltip: 'Play',
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => StreamPlayer(
+                                        url: streamLink[resolution]![0]
+                                            as String,
+                                        title: liveInfo['title'],
+                                        danmakuId:
+                                            int.parse(liveInfo['roomId']),
+                                        type: 'bilibili',
+                                      )));
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.copy),
+                        tooltip: 'Copy',
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(
+                              text: streamLink[resolution]![0] as String));
+                          //show a scaffold to show the copy success
+                          ScaffoldMessenger.of(this.context)
+                              .showSnackBar(const SnackBar(
+                                  content: Text(
+                            'Copied to clipboard',
+                          )));
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.comment_outlined),
+                        tooltip: 'Only danmaku',
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PureDanmaku(
+                                        title: liveInfo['title'],
+                                        danmakuId:
+                                            int.parse(liveInfo['roomId']),
+                                        type: 'bilibili',
+                                      )));
+                        },
+                      ),
+                    ],
+                  ),
+                  onTap: () {},
+                ));
+              }
               return AlertDialog(
                 title: Text(liveInfo['title']),
                 content: Column(
@@ -410,11 +478,11 @@ class BilibiliOnlineListTile extends StatelessWidget {
                     Image.network(liveInfo['keyframe'],
                         //show loading progress
                         height: 200, errorBuilder: (context, child, error) {
-                      debugPrint(error.toString());
                       return SizedBox(
                         height: 200,
                         child: Center(
-                          child: Text('Error loading image:$error.toString()'),
+                          child:
+                              Text('Error loading image:${error.toString()}'),
                         ),
                       );
                     }, loadingBuilder: (context, child, progress) {
@@ -425,7 +493,10 @@ class BilibiliOnlineListTile extends StatelessWidget {
                               child:
                                   Center(child: CircularProgressIndicator()));
                     }),
-                    Text('Stream Link: ${streamLink['4']![0]}'),
+                    const SizedBox(height: 10),
+                    Column(
+                      children: resolutionListTiles,
+                    ),
                   ],
                 ),
                 actions: <Widget>[
@@ -438,6 +509,19 @@ class BilibiliOnlineListTile extends StatelessWidget {
                           return const Home();
                         }));
                       }),
+/*                   TextButton(
+                    child: const Text('jump to danmaku(test)'),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PureDanmaku(
+                                    title: liveInfo['title'],
+                                    danmakuId: int.parse(liveInfo['roomId']),
+                                    type: 'bilibili',
+                                  )));
+                    },
+                  ), */
                   ElevatedButton(
                     child: const Text('Back'),
                     onPressed: () {

@@ -29,12 +29,6 @@ class SettingsPage extends StatelessWidget {
             ),
             onTap: () {},
           ),
-          SwitchListTile(
-              title: const Text('A Switch List Tile'),
-              value: false,
-              onChanged: (value) {
-                value = true;
-              }),
           const SectionTitle(
             title: 'Experimental',
           ),

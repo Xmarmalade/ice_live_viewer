@@ -3,23 +3,6 @@ import 'dart:convert';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
-void main() {
-  getLiveInfo('243547').then((value) {
-    print(value);
-  });
-}
-
-Future<String> _getLiveHtml(String url) async {
-  var resp = await http.get(
-    Uri.parse(url),
-    headers: {
-      'User-Agent':
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
-    },
-  );
-  return resp.body;
-}
-
 Future<Map<String, dynamic>> _getFromHuyaApi(String roomId) async {
   var resp = await http.get(
     Uri.parse(
@@ -33,7 +16,7 @@ Future<Map<String, dynamic>> _getFromHuyaApi(String roomId) async {
   return json['data'];
 }
 
-Future<Map<String, dynamic>> _getFromUnofficialApi(
+/* Future<Map<String, dynamic>> _getFromUnofficialApi(
     String api, String roomId) async {
   var resp = await http.get(
     Uri.parse('$api/$roomId'),
@@ -43,7 +26,7 @@ Future<Map<String, dynamic>> _getFromUnofficialApi(
     },
   );
   return json.decode(resp.body)['data'];
-}
+} */
 
 ///接收url 返回直播信息
 ///
@@ -104,16 +87,6 @@ Future<Map<String, dynamic>> getLiveInfo(String url) async {
       }
       finalLinks[cdnType] = cdnLinks;
     }
-    print({
-      'name': name,
-      'title': title,
-      'liveStatus': '1',
-      'avatar': avatar,
-      'cover': cover,
-      'luid': lUid,
-      'cdnCount': finalLinks.length,
-      'linkList': finalLinks,
-    });
     return {
       'name': name,
       'title': title,
@@ -138,7 +111,6 @@ Future<String> fixRoomId(String notDigitRoomId) async {
   String value = resp.body;
   var dataLive = parse(value);
   var body = dataLive.getElementsByTagName('body')[0];
-  print(body.getElementsByTagName('script'));
   var script = body.getElementsByTagName('script')[3];
   String json = script.text.replaceAll('window.HNF_GLOBAL_INIT = ', '');
   return jsonDecode(json)['roomInfo']['tProfileInfo']['lProfileRoom']
