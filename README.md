@@ -2,17 +2,22 @@
 
 <img width="100" alt="image" src="https://user-images.githubusercontent.com/16839488/159170616-6633b2c9-0b33-4dd1-9de4-b73b9d70eca4.png">
 
+![](https://img.shields.io/badge/language-dart-blue.svg?style=for-the-badge)
+[![](https://img.shields.io/github/downloads/iiijam/ice_live_viewer/total?style=for-the-badge)](https://github.com/iiijam/ice_live_viewer/releases)
+![](https://img.shields.io/github/license/iiijam/ice_live_viewer?style=for-the-badge)
+![](https://img.shields.io/github/stars/iiijam/ice_live_viewer?style=for-the-badge)
+![](https://img.shields.io/github/issues/iiijam/ice_live_viewer?style=for-the-badge)
 
 A Flutter project can make you watch live with ease.
 
-一个Flutter直播应用程序
+一个Flutter直播应用程序，轻松看直播。
 
 ## Features
 
-- Follow many anchors 
-- Check the status of the anchor
-- View the cover of the anchor's live stream
-- Get the address of the live room from multiple CDNs
+- Follow many anchors 追踪各平台主播
+- Check the status of the anchor 检查主播开播状态
+- View the cover of the anchor's live stream 查看封面
+- Get the address of the live room from multiple CDNs and qualities 选择不同的线路和质量
 
 ## Screenshots
 
