@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:ice_live_viewer/utils/storage.dart';
 
 /// 获取网页json数据 由于bilibili的编码utf-8 所以需要转换
 Future<dynamic> _getJson(String url) async {
@@ -58,8 +59,10 @@ Future<Map<String, String>> getLiveInfo(String roomId) async {
 ///
 /// 返回画质-链接列表{'4': [主线，备线，备线，备线],'3': [主线，备线，备线，备线]}
 Future<Map<String, List>> getStreamLink(String roomId) async {
+  bool useM3u8 = await getSwitchPref('use_m3u8');
+  String platform = useM3u8 ? 'h5' : 'web';
   String defaultStreamUrl =
-      'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=$roomId&platform=h5&otype=json&quality=4';
+      'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=$roomId&platform=$platform&otype=json&quality=4';
   dynamic streamJson = await _getJson(defaultStreamUrl);
   List<dynamic> acceptQuality = streamJson['data']['accept_quality'];
   Map<String, List> streamMap = {};
@@ -75,7 +78,7 @@ Future<Map<String, List>> getStreamLink(String roomId) async {
     for (String qualityOption in acceptQuality) {
       if (qualityOption != '4') {
         String candidateStreamUrl =
-            'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=$roomId&platform=h5&otype=json&quality=$qualityOption';
+            'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=$roomId&platform=$platform&otype=json&quality=$qualityOption';
         dynamic otherStreamJson = await _getJson(candidateStreamUrl);
         List<dynamic> otherStreamList = otherStreamJson['data']['durl'];
         List<String> otherStreamListUrl = [];

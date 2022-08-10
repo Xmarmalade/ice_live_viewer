@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ice_live_viewer/utils/storage.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -32,14 +33,18 @@ class SettingsPage extends StatelessWidget {
           const SectionTitle(
             title: 'Experimental',
           ),
-          SwitchListTile(
-              title: const Text('Use Native Player'),
-              subtitle: const Text(
-                  'This setup only uses Win32 APIs & no texture, intermediate buffers or copying of pixel buffers.'),
-              value: false,
-              onChanged: (value) {
-                value = true;
-              }),
+          const SwitchTile(
+            title: 'Use Native Player',
+            subtitle:
+                'This setup only uses Win32 APIs & no texture, intermediate buffers or copying of pixel buffers.',
+            settingKey: 'use_native_player',
+          ),
+          const SwitchTile(
+            title: 'Use .m3u8 for Bilibili',
+            subtitle:
+                'Use .m3u8 format to play Bilibili live stream instead of the default .flv format, when you find that Bilibili live stream cannot be played, you can try this option.',
+            settingKey: 'use_m3u8',
+          )
         ],
       ),
     );
@@ -57,5 +62,48 @@ class SectionTitle extends StatelessWidget {
     return ListTile(
       title: Text(title, style: Theme.of(context).textTheme.headline1),
     );
+  }
+}
+
+class SwitchTile extends StatefulWidget {
+  const SwitchTile({
+    Key? key,
+    required this.title,
+    required this.subtitle,
+    required this.settingKey,
+  }) : super(key: key);
+
+  final String title;
+  final String subtitle;
+  final String settingKey;
+
+  @override
+  State<SwitchTile> createState() => _SwitchTileState();
+}
+
+class _SwitchTileState extends State<SwitchTile> {
+  bool? _toggled = false;
+
+  @override
+  void initState() {
+    getSwitchPref(widget.settingKey).then((value) {
+      _toggled = value;
+      setState(() {});
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+        title: Text(widget.title),
+        subtitle: Text(widget.subtitle),
+        value: _toggled!,
+        onChanged: (bool value) {
+          switchPref(widget.settingKey);
+          setState(() {
+            _toggled = value;
+          });
+        });
   }
 }
