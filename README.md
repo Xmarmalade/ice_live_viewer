@@ -2,11 +2,12 @@
 
 <img width="100" alt="image" src="https://user-images.githubusercontent.com/16839488/159170616-6633b2c9-0b33-4dd1-9de4-b73b9d70eca4.png">
 
-![](https://img.shields.io/badge/language-dart-blue.svg?style=for-the-badge)
-[![](https://img.shields.io/github/downloads/iiijam/ice_live_viewer/total?style=for-the-badge)](https://github.com/iiijam/ice_live_viewer/releases)
+![](https://img.shields.io/badge/language-dart-blue.svg?style=for-the-badge&color=00ACC1)
+![](https://img.shields.io/badge/flutter-00B0FF?style=for-the-badge&logo=flutter)
+[![](https://img.shields.io/github/downloads/iiijam/ice_live_viewer/total?style=for-the-badge&color=FF2196)](https://github.com/iiijam/ice_live_viewer/releases)
 ![](https://img.shields.io/github/license/iiijam/ice_live_viewer?style=for-the-badge)
 ![](https://img.shields.io/github/stars/iiijam/ice_live_viewer?style=for-the-badge)
-![](https://img.shields.io/github/issues/iiijam/ice_live_viewer?style=for-the-badge)
+![](https://img.shields.io/github/issues/iiijam/ice_live_viewer?style=for-the-badge&color=9C27B0)
 
 A Flutter project can make you watch live with ease.
 
