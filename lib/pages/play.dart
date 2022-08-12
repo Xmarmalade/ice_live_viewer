@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:dart_vlc/dart_vlc.dart';
+import 'package:ice_live_viewer/widgets/videoframe.dart';
 import 'package:ice_live_viewer/widgets/bilibilianmaku.dart';
 import 'package:ice_live_viewer/widgets/huyadanmaku.dart';
 
@@ -38,10 +38,12 @@ class _StreamPlayerState extends State<StreamPlayer> {
         MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
     final nativeVideo = Video(
       player: streamPlayer,
-      showControls: true,
+      showControls: false,
       //showFullscreenButton: true,
       showTimeLeft: false,
     );
+    final videoFrame =
+        LiveVideoFrame(videoWidget: nativeVideo, player: streamPlayer);
     final danmakuListView = widget.type == 'huya'
         ? HuyaDanmakuListView(danmakuId: widget.danmakuId)
         : BilibiliDanmakuListView(roomId: widget.danmakuId);
@@ -59,13 +61,13 @@ class _StreamPlayerState extends State<StreamPlayer> {
         body: ratio > 1.2
             ? Row(
                 children: <Widget>[
-                  Expanded(flex: 4, child: nativeVideo),
+                  Expanded(flex: 4, child: videoFrame),
                   Expanded(flex: 1, child: danmakuListView),
                 ],
               )
             : Column(
                 children: <Widget>[
-                  Expanded(flex: 3, child: nativeVideo),
+                  Expanded(flex: 3, child: videoFrame),
                   Expanded(flex: 5, child: danmakuListView),
                 ],
               ));
