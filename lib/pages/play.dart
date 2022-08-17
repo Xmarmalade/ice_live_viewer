@@ -26,7 +26,6 @@ class _StreamPlayerState extends State<StreamPlayer> {
   @override
   void initState() {
     super.initState();
-    debugPrint('initState');
     final streamInfo = Media.network(widget.url);
     streamPlayer.open(streamInfo, autoStart: true);
     setState(() {});
@@ -36,12 +35,7 @@ class _StreamPlayerState extends State<StreamPlayer> {
   Widget build(BuildContext context) {
     final ratio =
         MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
-    final nativeVideo = Video(
-      player: streamPlayer,
-      showControls: false,
-      //showFullscreenButton: true,
-      showTimeLeft: false,
-    );
+    final nativeVideo = Video(player: streamPlayer, showControls: false);
     final videoFrame =
         LiveVideoFrame(videoWidget: nativeVideo, player: streamPlayer);
     final danmakuListView = widget.type == 'huya'

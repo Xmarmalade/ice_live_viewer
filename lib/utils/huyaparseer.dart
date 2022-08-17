@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
+import 'package:ice_live_viewer/utils/storage.dart';
 
 Future<Map<String, dynamic>> _getFromHuyaApi(String roomId) async {
   var resp = await http.get(
@@ -44,6 +45,8 @@ Future<Map<String, dynamic>> getLiveInfo(String url) async {
     roomId = await fixRoomId(roomId);
   }
   Map roomInfo = await _getFromHuyaApi(roomId);
+  bool useCustomResolution =
+      await getSwitchPref('use_custom_resolution_for_huya');
   String liveStatus = roomInfo['liveStatus'];
   String name = roomInfo['profileInfo']['nick'];
   String avatar = roomInfo['profileInfo']['avatar180'];
@@ -69,19 +72,23 @@ Future<Map<String, dynamic>> getLiveInfo(String url) async {
     Map streamDict = roomInfo['stream']['flv'];
     List multiLine = streamDict['multiLine'];
     List rateArray = streamDict['rateArray'];
-    Map supportResolutions = {};
+    Map supportedResolutions = {};
     Map finalLinks = {};
     for (Map resolutions in rateArray) {
       String bitrate = resolutions['iBitRate'].toString();
-      supportResolutions[resolutions['sDisplayName']] = '_$bitrate';
+      supportedResolutions[resolutions['sDisplayName']] = '_$bitrate';
     }
+    Map reso = useCustomResolution
+        ? {'1080P': '_4000', '720P': '_2000', '540P': '_1500'}
+        : supportedResolutions;
+
     for (Map item in multiLine) {
       String url = item['url'];
       String cdnType = item['cdnType'];
       Map cdnLinks = {};
       cdnLinks['原画'] = url;
-      for (String resolution in supportResolutions.keys) {
-        String key = supportResolutions[resolution];
+      for (String resolution in reso.keys) {
+        String key = reso[resolution];
         String tempUrl = url.replaceAll('imgplus.flv', 'imgplus$key.flv');
         cdnLinks[resolution] = tempUrl;
       }

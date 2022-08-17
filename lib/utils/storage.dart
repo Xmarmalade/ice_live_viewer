@@ -64,7 +64,6 @@ Future<bool> initStorage() async {
   List<String>? linksList = prefs.getStringList('links');
   if (linksList == null) {
     prefs.setStringList('links', []);
-    prefs.setString('settings', '');
     return true;
   }
   return false;
@@ -97,10 +96,10 @@ Future<bool> deleteData(String key) async {
 Future<bool> switchPref(String key) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   if (prefs.getBool(key) == true) {
-    debugPrint('$key true -> false');
+    //debugPrint('$key true -> false');
     return prefs.setBool(key, false);
   } else {
-    debugPrint('$key false -> true');
+    //debugPrint('$key false -> true');
     return prefs.setBool(key, true);
   }
 }
@@ -108,6 +107,6 @@ Future<bool> switchPref(String key) async {
 Future<bool> getSwitchPref(String key) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  debugPrint('$key is ${prefs.getBool(key)}');
+  //debugPrint('$key is ${prefs.getBool(key)}');
   return prefs.getBool(key)!;
 }

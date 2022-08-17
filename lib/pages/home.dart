@@ -15,6 +15,8 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('IceLiveViewer'),
+        titleSpacing: 5,
+        leadingWidth: 68,
       ),
       body: const ListViewFutureBuilder(),
       drawer: const HomeDrawer(),
@@ -279,7 +281,11 @@ class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
                   } else if (type == 'bilibili') {
                     return BilibiliFutureListTileSkeleton(url: url);
                   } else {
-                    return ErrorListTile(error: type, rawLink: url);
+                    return ErrorListTile(
+                      error: type,
+                      rawLink: url,
+                      stackTrace: '',
+                    );
                   }
                 },
               );
