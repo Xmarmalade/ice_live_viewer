@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MyTheme {
   ThemeData lightThemeData = ThemeData(
-      primarySwatch: Colors.indigo,
+      primarySwatch: Colors.purple,
       useMaterial3: true,
       textTheme: const TextTheme(
         headline1: TextStyle(

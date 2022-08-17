@@ -30,6 +30,12 @@ class SettingsPage extends StatelessWidget {
             ),
             onTap: () {},
           ),
+          const SwitchTile(
+            title: 'Use custom resolution for Huya',
+            subtitle:
+                'Use custom resolution for Huya, if you want to use a custom resolution for Huya, you should enable this option',
+            settingKey: 'use_custom_resolution_for_huya',
+          ),
           const SectionTitle(
             title: 'Experimental',
           ),

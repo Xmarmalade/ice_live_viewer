@@ -16,6 +16,7 @@ class HelpPage extends StatelessWidget {
         title: const Text('Help'),
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: const <Widget>[
           SectionTitle(
             title: '如何使用',
@@ -47,10 +48,7 @@ class TextTile extends StatelessWidget {
       title: Text(
         text,
         textAlign: TextAlign.left,
-        style: const TextStyle(
-            color: Color(0xFFFFFFFF),
-            fontSize: 16,
-            fontWeight: FontWeight.normal),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
       ),
     );
   }

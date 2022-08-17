@@ -5,6 +5,7 @@ import 'package:ice_live_viewer/pages/home.dart';
 import 'package:ice_live_viewer/pages/play.dart';
 import 'package:ice_live_viewer/utils/bilibiliparser.dart' as bilibili;
 import 'package:ice_live_viewer/utils/huyaparseer.dart' as huya;
+import 'package:ice_live_viewer/utils/keepalivewrapper.dart';
 import 'package:ice_live_viewer/utils/linkparser.dart';
 import 'package:ice_live_viewer/utils/storage.dart' as storage;
 
@@ -18,38 +19,45 @@ class HuyaFutureListTileSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: huya.getLiveInfo(url),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          Map<String, dynamic> liveInfo =
-              (snapshot.data as Map<String, dynamic>);
-          if (liveInfo['liveStatus'] == "0") {
-            return OfflineListTile(
-              anchor: liveInfo['name'],
+    return KeepAliveWrapper(
+      keepAlive: true,
+      child: FutureBuilder(
+        future: huya.getLiveInfo(url),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            Map<String, dynamic> liveInfo =
+                (snapshot.data as Map<String, dynamic>);
+            if (liveInfo['liveStatus'] == "0") {
+              return OfflineListTile(
+                anchor: liveInfo['name'],
+                rawLink: url,
+                avatar: liveInfo['avatar'],
+                title: liveInfo['title'],
+              );
+            } else if (liveInfo['liveStatus'] == "2") {
+              return OfflineListTile(
+                anchor: liveInfo['name'],
+                rawLink: url,
+                avatar: liveInfo['avatar'],
+                title: liveInfo['title'],
+              );
+            } else {
+              return HuyaOnlineListTile(
+                  rawLink: url, context: context, liveInfo: liveInfo);
+            }
+          } else if (snapshot.hasError) {
+            return ErrorListTile(
+              error: snapshot.error,
               rawLink: url,
-              avatar: liveInfo['avatar'],
-              title: liveInfo['title'],
+              stackTrace: snapshot.stackTrace,
             );
-          } else if (liveInfo['liveStatus'] == "2") {
-            return OfflineListTile(
-              anchor: liveInfo['name'],
-              rawLink: url,
-              avatar: liveInfo['avatar'],
-              title: liveInfo['title'],
-            );
-          } else {
-            return HuyaOnlineListTile(
-                rawLink: url, context: context, liveInfo: liveInfo);
           }
-        } else if (snapshot.hasError) {
-          return ErrorListTile(error: snapshot.error, rawLink: url);
-        }
-        return const ListTile(
-          title: Text('Loading...'),
-          subtitle: LinearProgressIndicator(),
-        );
-      },
+          return const ListTile(
+            title: Text('Loading...'),
+            subtitle: LinearProgressIndicator(),
+          );
+        },
+      ),
     );
   }
 }
@@ -87,13 +95,24 @@ class HuyaOnlineListTile extends StatelessWidget {
                 String cdnName = cdn;
                 Map cdnLinkMap = linkList[cdn];
                 String cdnLink = cdnLinkMap['原画'];
-                String fhdLink =
+/*                 String fhdLink =
                     cdnLink.replaceAll('imgplus.flv', 'imgplus_4000.flv');
                 String hdLink =
                     cdnLink.replaceAll('imgplus.flv', 'imgplus_2000.flv');
                 String sdLink =
-                    cdnLink.replaceAll('imgplus.flv', 'imgplus_1500.flv');
-                List<PopupMenuEntry<String>> resolution = [
+                    cdnLink.replaceAll('imgplus.flv', 'imgplus_1500.flv'); */
+                //给定的清晰度
+                List<PopupMenuEntry<String>> givenResolution = [];
+                for (String reso in cdnLinkMap.keys) {
+                  givenResolution.add(
+                    PopupMenuItem(
+                      value: cdnLinkMap[reso],
+                      child: Text(reso),
+                    ),
+                  );
+                }
+                /* //自定的清晰度
+                List<PopupMenuEntry<String>> customResolution = [
                   PopupMenuItem(
                     value: fhdLink,
                     child: const Text('1080P'),
@@ -106,72 +125,71 @@ class HuyaOnlineListTile extends StatelessWidget {
                     value: sdLink,
                     child: const Text('540P'),
                   ),
-                ];
-                cdnListTiles.add(ListTile(
-                  leading: Text(cdnName),
-                  subtitle: Text(
-                    cdnLink,
-                    maxLines: 2,
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      PopupMenuButton<String>(
-                        icon: const Icon(Icons.copy),
-                        tooltip: 'Copy',
-                        onSelected: (context) {
-                          Clipboard.setData(ClipboardData(text: context));
-                          //show a scaffold to show the copy success
-                          ScaffoldMessenger.of(this.context)
-                              .showSnackBar(const SnackBar(
-                                  content: Text(
-                            'Copied to clipboard',
-                          )));
-                        },
-                        itemBuilder: (context) {
-                          return resolution;
-                        },
-                      ),
-                      PopupMenuButton<String>(
-                        icon: const Icon(Icons.play_arrow),
-                        tooltip: 'Play',
-                        onSelected: (context) {
-                          String roomSelectedUrl = context;
-                          Navigator.push(
-                              this.context,
-                              MaterialPageRoute(
-                                  builder: (context) => StreamPlayer(
+                ]; */
+                cdnListTiles.add(
+                  ListTile(
+                    leading: Text(cdnName),
+                    subtitle: Text(
+                      cdnLink,
+                      maxLines: 2,
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        PopupMenuButton<String>(
+                          icon: const Icon(Icons.copy),
+                          tooltip: 'Copy',
+                          onSelected: (context) {
+                            Clipboard.setData(ClipboardData(text: context));
+                            //show a scaffold to show the copy success
+                            ScaffoldMessenger.of(this.context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Copied to clipboard')));
+                          },
+                          itemBuilder: (context) {
+                            return givenResolution;
+                          },
+                        ),
+                        PopupMenuButton<String>(
+                          icon: const Icon(Icons.play_arrow),
+                          tooltip: 'Play',
+                          onSelected: (context) {
+                            String roomSelectedUrl = context;
+                            Navigator.push(
+                                this.context,
+                                MaterialPageRoute(
+                                    builder: (context) => StreamPlayer(
                                         title: title,
                                         url: roomSelectedUrl,
                                         danmakuId: lUid,
-                                        type: 'huya',
-                                      )));
-                        },
-                        itemBuilder: (context) {
-                          return resolution;
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.comment_outlined),
-                        tooltip: 'Only danmaku',
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => PureDanmaku(
+                                        type: 'huya')));
+                          },
+                          itemBuilder: (context) {
+                            return givenResolution;
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.comment_outlined),
+                          tooltip: 'Only danmaku',
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PureDanmaku(
                                         title: title,
                                         danmakuId: lUid,
-                                        type: 'huya',
-                                      )));
-                        },
-                      )
-                    ],
+                                        type: 'huya')));
+                          },
+                        )
+                      ],
+                    ),
                   ),
-                ));
+                );
               }
               return AlertDialog(
                 scrollable: true,
-                title: Text(title),
+                title:
+                    Text(title, style: Theme.of(context).textTheme.headline1),
                 content: SizedBox(
                   width: double.infinity,
                   child: Column(
@@ -279,10 +297,12 @@ class ErrorListTile extends StatelessWidget {
     Key? key,
     required this.error,
     required this.rawLink,
+    required this.stackTrace,
   }) : super(key: key);
 
   final Object? error;
   final String rawLink;
+  final Object? stackTrace;
 
   @override
   Widget build(BuildContext context) {
@@ -301,9 +321,11 @@ class ErrorListTile extends StatelessWidget {
             context: context,
             builder: (context) {
               return AlertDialog(
+                  scrollable: true,
                   title: const Text(
-                      'For specific reasons, we do not have access to this live room. Please check whether this live room can be accessed normally, if not, please submit the error message below.'),
-                  content: Text('$error'),
+                      'For specific reasons, we do not have access to this live room. Please check whether this live room can be accessed normally, if not, please submit the error message below.\n出现了问题，下面的内容或许可以帮助解决问题'),
+                  content: Text(
+                      'The Error is:\n$error \nHere is the raw link: $rawLink\nStack is:\n$stackTrace'),
                   actions: <Widget>[
                     TextButton(
                         child: const Text('Delete'),
@@ -313,7 +335,13 @@ class ErrorListTile extends StatelessWidget {
                               MaterialPageRoute(builder: (context) {
                             return const Home();
                           }));
-                        })
+                        }),
+                    ElevatedButton(
+                        child: const Text('Copy Error'),
+                        onPressed: () {
+                          Clipboard.setData(
+                              ClipboardData(text: '$error\n$stackTrace'));
+                        }),
                   ]);
             });
       },
@@ -332,40 +360,45 @@ class BilibiliFutureListTileSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String roomId = LinkParser().getRoomId(url);
-    return FutureBuilder(
-      future: bilibili.getLiveInfoAndStreamLink(roomId),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          Map<String, dynamic> liveInfo = (snapshot.data as Map)['liveInfo'];
-          if (liveInfo['liveStatus'] == '0') {
-            return OfflineListTile(
-              anchor: liveInfo['uname'],
-              rawLink: url,
-              avatar: liveInfo['avatar'],
-            );
-          } else if (liveInfo['liveStatus'] == '2') {
-            return OfflineListTile(
-              anchor: liveInfo['uname'],
-              rawLink: url,
-              avatar: liveInfo['avatar'],
-            );
-          } else {
-            Map<String, List> streamLink = (snapshot.data as Map)['streamLink'];
-            liveInfo['roomId'] = roomId;
-            return BilibiliOnlineListTile(
-                context: context,
+    return KeepAliveWrapper(
+      keepAlive: true,
+      child: FutureBuilder(
+        future: bilibili.getLiveInfoAndStreamLink(roomId),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            Map<String, dynamic> liveInfo = (snapshot.data as Map)['liveInfo'];
+            if (liveInfo['liveStatus'] == '0') {
+              return OfflineListTile(
+                  anchor: liveInfo['uname'],
+                  rawLink: url,
+                  avatar: liveInfo['avatar']);
+            } else if (liveInfo['liveStatus'] == '2') {
+              return OfflineListTile(
+                  anchor: liveInfo['uname'],
+                  rawLink: url,
+                  avatar: liveInfo['avatar']);
+            } else {
+              Map<String, List> streamLink =
+                  (snapshot.data as Map)['streamLink'];
+              liveInfo['roomId'] = roomId;
+              return BilibiliOnlineListTile(
+                  context: context,
+                  rawLink: url,
+                  liveInfo: liveInfo,
+                  streamLink: streamLink);
+            }
+          } else if (snapshot.hasError) {
+            return ErrorListTile(
+                error: snapshot.error,
                 rawLink: url,
-                liveInfo: liveInfo,
-                streamLink: streamLink);
+                stackTrace: snapshot.stackTrace);
           }
-        } else if (snapshot.hasError) {
-          return ErrorListTile(error: snapshot.error, rawLink: url);
-        }
-        return const ListTile(
-          title: Text('Loading...'),
-          subtitle: LinearProgressIndicator(),
-        );
-      },
+          return const ListTile(
+            title: Text('Loading...'),
+            subtitle: LinearProgressIndicator(),
+          );
+        },
+      ),
     );
   }
 }
@@ -409,6 +442,17 @@ class BilibiliOnlineListTile extends StatelessWidget {
                 String resolutionHint = resolution == '4'
                     ? '原画'
                     : (resolution == '3' ? '超清' : '高清');
+                List linkList = streamLink[resolution]!;
+                List<PopupMenuEntry<String>> givenCdn = [];
+                for (String cdnLink in linkList) {
+                  givenCdn.add(
+                    PopupMenuItem<String>(
+                      value: cdnLink,
+                      child: Text(
+                          cdnLink.split('&').last.replaceAll('order=', '线路')),
+                    ),
+                  );
+                }
                 resolutionListTiles.add(ListTile(
                   leading: Text(resolutionHint),
                   subtitle: Text(
@@ -416,38 +460,40 @@ class BilibiliOnlineListTile extends StatelessWidget {
                     maxLines: 2,
                   ),
                   trailing: Row(
-                    //TODO:添加播放按钮
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(
+                      PopupMenuButton<String>(
                         icon: const Icon(Icons.play_arrow),
                         tooltip: 'Play',
-                        onPressed: () {
+                        onSelected: (context) {
+                          String roomSelectedUrl = context;
                           Navigator.push(
-                              context,
+                              this.context,
                               MaterialPageRoute(
                                   builder: (context) => StreamPlayer(
-                                        url: streamLink[resolution]![0]
-                                            as String,
-                                        title: liveInfo['title'],
-                                        danmakuId:
-                                            int.parse(liveInfo['roomId']),
-                                        type: 'bilibili',
-                                      )));
+                                      url: roomSelectedUrl,
+                                      title: liveInfo['title'],
+                                      danmakuId: int.parse(liveInfo['roomId']),
+                                      type: 'bilibili')));
+                        },
+                        itemBuilder: (context) {
+                          return givenCdn;
                         },
                       ),
-                      IconButton(
+                      PopupMenuButton<String>(
                         icon: const Icon(Icons.copy),
                         tooltip: 'Copy',
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(
-                              text: streamLink[resolution]![0] as String));
+                        onSelected: (context) {
+                          String roomSelectedUrl = context;
+                          Clipboard.setData(
+                              ClipboardData(text: roomSelectedUrl));
                           //show a scaffold to show the copy success
-                          ScaffoldMessenger.of(this.context)
-                              .showSnackBar(const SnackBar(
-                                  content: Text(
-                            'Copied to clipboard',
-                          )));
+                          ScaffoldMessenger.of(this.context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Copied to clipboard')));
+                        },
+                        itemBuilder: (context) {
+                          return givenCdn;
                         },
                       ),
                       IconButton(
@@ -458,16 +504,14 @@ class BilibiliOnlineListTile extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => PureDanmaku(
-                                        title: liveInfo['title'],
-                                        danmakuId:
-                                            int.parse(liveInfo['roomId']),
-                                        type: 'bilibili',
-                                      )));
+                                      title: liveInfo['title'],
+                                      danmakuId: int.parse(liveInfo['roomId']),
+                                      type: 'bilibili')));
                         },
                       ),
                     ],
                   ),
-                  onTap: () {},
+                  //onTap: () {},
                 ));
               }
               return AlertDialog(
