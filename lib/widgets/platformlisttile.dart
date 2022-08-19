@@ -5,6 +5,7 @@ import 'package:ice_live_viewer/pages/home.dart';
 import 'package:ice_live_viewer/pages/play.dart';
 import 'package:ice_live_viewer/utils/bilibiliparser.dart' as bilibili;
 import 'package:ice_live_viewer/utils/huyaparseer.dart' as huya;
+import 'package:ice_live_viewer/utils/douyuparser.dart';
 import 'package:ice_live_viewer/utils/keepalivewrapper.dart';
 import 'package:ice_live_viewer/utils/linkparser.dart';
 import 'package:ice_live_viewer/utils/storage.dart' as storage;
@@ -566,6 +567,215 @@ class BilibiliOnlineListTile extends StatelessWidget {
                                   )));
                     },
                   ), */
+                  ElevatedButton(
+                    child: const Text('Back'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              );
+            });
+      },
+    );
+  }
+}
+
+class DouyuFutureListTileSkeleton extends StatelessWidget {
+  const DouyuFutureListTileSkeleton({
+    Key? key,
+    required this.url,
+  }) : super(key: key);
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    String roomId = url.split('/').last;
+    return KeepAliveWrapper(
+      keepAlive: true,
+      child: FutureBuilder(
+        future: Douyu(roomId).getRoomFullInfo(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            Map<String, dynamic> liveInfo =
+                (snapshot.data as Map<String, dynamic>);
+            if (liveInfo['liveStatus'] == 0) {
+              return OfflineListTile(
+                anchor: liveInfo['name'],
+                rawLink: url,
+                avatar: liveInfo['avatar'],
+                title: liveInfo['title'],
+              );
+            } else {
+              return DouyuOnlineListTile(
+                  rawLink: url, context: context, liveInfo: liveInfo);
+            }
+          } else if (snapshot.hasError) {
+            return ErrorListTile(
+              error: snapshot.error,
+              rawLink: url,
+              stackTrace: snapshot.stackTrace,
+            );
+          }
+          return const ListTile(
+            title: Text('Loading...'),
+            subtitle: LinearProgressIndicator(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class DouyuOnlineListTile extends StatelessWidget {
+  const DouyuOnlineListTile({
+    Key? key,
+    required this.rawLink,
+    required this.liveInfo,
+    required this.context,
+  }) : super(key: key);
+
+  final Map<String, dynamic> liveInfo;
+  final BuildContext context;
+  final String rawLink;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(liveInfo['avatar']),
+      ),
+      title: Text(liveInfo['title']),
+      subtitle: Text(liveInfo['name']),
+      trailing: const Icon(Icons.chevron_right_sharp),
+      onTap: () {
+        showDialog(
+            context: context,
+            builder: (context) {
+              String title = liveInfo['title'];
+              int lUid = int.parse(liveInfo['id']);
+              Map linkList = liveInfo['linkList'];
+              List<Widget> cdnListTiles = [];
+              for (String cdn in linkList.keys) {
+                String cdnName = cdn;
+                Map cdnLinkMap = linkList[cdn];
+                String cdnLink = cdnLinkMap['原画'];
+                //给定的清晰度
+                List<PopupMenuEntry<String>> givenResolution = [];
+                for (String reso in cdnLinkMap.keys) {
+                  givenResolution.add(
+                    PopupMenuItem(
+                      value: cdnLinkMap[reso],
+                      child: Text(reso),
+                    ),
+                  );
+                }
+                cdnListTiles.add(
+                  ListTile(
+                    leading: Text(cdnName),
+                    subtitle: Text(
+                      cdnLink,
+                      maxLines: 2,
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        PopupMenuButton<String>(
+                          icon: const Icon(Icons.copy),
+                          tooltip: 'Copy',
+                          onSelected: (context) {
+                            Clipboard.setData(ClipboardData(text: context));
+                            //show a scaffold to show the copy success
+                            ScaffoldMessenger.of(this.context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Copied to clipboard')));
+                          },
+                          itemBuilder: (context) {
+                            return givenResolution;
+                          },
+                        ),
+                        PopupMenuButton<String>(
+                          icon: const Icon(Icons.play_arrow),
+                          tooltip: 'Play',
+                          onSelected: (context) {
+                            String roomSelectedUrl = context;
+                            Navigator.push(
+                                this.context,
+                                MaterialPageRoute(
+                                    builder: (context) => StreamPlayer(
+                                        title: title,
+                                        url: roomSelectedUrl,
+                                        danmakuId: lUid,
+                                        type: 'huya')));
+                          },
+                          itemBuilder: (context) {
+                            return givenResolution;
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.comment_outlined),
+                          tooltip: 'Only danmaku',
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PureDanmaku(
+                                        title: title,
+                                        danmakuId: lUid,
+                                        type: 'huya')));
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                );
+              }
+              return AlertDialog(
+                scrollable: true,
+                title:
+                    Text(title, style: Theme.of(context).textTheme.headline1),
+                content: SizedBox(
+                  width: double.infinity,
+                  child: Column(
+                    children: <Widget>[
+                      //show network image of cover
+                      Image.network(liveInfo['cover'],
+                          //show loading progress
+                          height: 200, errorBuilder: (context, child, error) {
+                        debugPrint(error.toString());
+                        return SizedBox(
+                          height: 200,
+                          child: Center(
+                            child:
+                                Text('Error loading image:$error.toString()'),
+                          ),
+                        );
+                      }, loadingBuilder: (context, child, progress) {
+                        return progress == null
+                            ? child
+                            : const SizedBox(
+                                height: 200,
+                                child:
+                                    Center(child: CircularProgressIndicator()));
+                      }),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: cdnListTiles,
+                      )
+                    ],
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                      child: const Text('Delete'),
+                      onPressed: () {
+                        storage.deleteSingleLink(rawLink);
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return const Home();
+                        }));
+                      }),
                   ElevatedButton(
                     child: const Text('Back'),
                     onPressed: () {

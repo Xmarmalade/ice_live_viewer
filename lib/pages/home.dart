@@ -64,21 +64,53 @@ class FloatingButton extends StatelessWidget {
                     showDialog(
                         context: context,
                         builder: (context) {
-                          storage.saveSingleLink(LinkParser()
-                              .standardizeUrl(linkTextController.text));
-                          return AlertDialog(
-                            title: const Text('Success'),
-                            actions: [
-                              ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.push(context,
-                                        MaterialPageRoute(builder: (context) {
-                                      return const Home();
-                                    }));
-                                  },
-                                  child: const Text('Refresh'))
-                            ],
-                          );
+                          return FutureBuilder(
+                              future: LinkParser()
+                                  .formatUrl(linkTextController.text),
+                              //.then((value) => storage.saveSingleLink(value)),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  return AlertDialog(
+                                    title: const Text('Error'),
+                                    content: Text('${snapshot.error}'),
+                                    actions: [
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.push(context,
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                              return const Home();
+                                            }));
+                                          },
+                                          child: const Text('Refresh'))
+                                    ],
+                                  );
+                                } else if (snapshot.hasData) {
+                                  storage
+                                      .saveSingleLink(snapshot.data.toString());
+                                  return AlertDialog(
+                                    title: const Text('Success'),
+                                    actions: [
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.push(context,
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                              return const Home();
+                                            }));
+                                          },
+                                          child: const Text('Refresh'))
+                                    ],
+                                  );
+                                } else {
+                                  return const AlertDialog(
+                                    title: Text('Loading'),
+                                    content: LinearProgressIndicator(
+                                      minHeight: 10,
+                                    ),
+                                  );
+                                }
+                              });
                         });
                   },
                 ),
@@ -280,6 +312,8 @@ class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
                     return HuyaFutureListTileSkeleton(url: url);
                   } else if (type == 'bilibili') {
                     return BilibiliFutureListTileSkeleton(url: url);
+                  } else if (type == 'douyu') {
+                    return DouyuFutureListTileSkeleton(url: url);
                   } else {
                     return ErrorListTile(
                       error: type,
