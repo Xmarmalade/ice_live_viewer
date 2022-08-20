@@ -1,4 +1,5 @@
 import 'package:ice_live_viewer/utils/douyuparser.dart';
+import 'package:ice_live_viewer/utils/huyaparser.dart';
 
 class LinkParser {
   /// Parses a link and returns its id.
@@ -22,6 +23,9 @@ class LinkParser {
   Future<String> formatUrl(String url) async {
     String roomId = getRoomId(url);
     if (url.contains("huya")) {
+      if (int.tryParse(roomId) == null) {
+        roomId = await fixRoomId(roomId);
+      }
       return "https://m.huya.com/$roomId";
     } else if (url.contains("bilibili")) {
       return "https://live.bilibili.com/$roomId";

@@ -4,7 +4,7 @@ import 'package:ice_live_viewer/pages/danmaku.dart';
 import 'package:ice_live_viewer/pages/home.dart';
 import 'package:ice_live_viewer/pages/play.dart';
 import 'package:ice_live_viewer/utils/bilibiliparser.dart' as bilibili;
-import 'package:ice_live_viewer/utils/huyaparseer.dart' as huya;
+import 'package:ice_live_viewer/utils/huyaparser.dart' as huya;
 import 'package:ice_live_viewer/utils/douyuparser.dart';
 import 'package:ice_live_viewer/utils/keepalivewrapper.dart';
 import 'package:ice_live_viewer/utils/linkparser.dart';
@@ -707,7 +707,7 @@ class DouyuOnlineListTile extends StatelessWidget {
                                         title: title,
                                         url: roomSelectedUrl,
                                         danmakuId: lUid,
-                                        type: 'huya')));
+                                        type: 'douyu')));
                           },
                           itemBuilder: (context) {
                             return givenResolution;
@@ -723,7 +723,7 @@ class DouyuOnlineListTile extends StatelessWidget {
                                     builder: (context) => PureDanmaku(
                                         title: title,
                                         danmakuId: lUid,
-                                        type: 'huya')));
+                                        type: 'douyu')));
                           },
                         )
                       ],

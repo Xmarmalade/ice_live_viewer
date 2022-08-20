@@ -303,17 +303,21 @@ class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
                 );
               }
               return ListView.builder(
+                //shrinkWrap: true,
                 itemCount: count,
                 itemBuilder: (context, index) {
                   int indexNum = index + 1;
                   String url = (links)['$indexNum'].toString();
                   String type = LinkParser().checkType(url);
                   if (type == 'huya') {
-                    return HuyaFutureListTileSkeleton(url: url);
+                    return SizedBox(
+                        child: HuyaFutureListTileSkeleton(url: url));
                   } else if (type == 'bilibili') {
-                    return BilibiliFutureListTileSkeleton(url: url);
+                    return SizedBox(
+                        child: BilibiliFutureListTileSkeleton(url: url));
                   } else if (type == 'douyu') {
-                    return DouyuFutureListTileSkeleton(url: url);
+                    return SizedBox(
+                        child: DouyuFutureListTileSkeleton(url: url));
                   } else {
                     return ErrorListTile(
                       error: type,

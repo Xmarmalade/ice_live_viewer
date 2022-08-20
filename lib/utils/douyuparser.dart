@@ -76,16 +76,16 @@ class Douyu {
 
   Future<Map> _getRoomUrl() async {
     Map info = await _getRoomStreamInfo();
-    Map<String, dynamic> real_url = {'hw': {}, 'ws': {}};
+    Map<String, dynamic> realUrl = {'hw': {}, 'ws': {}};
     if (info['error'] == 0) {
       String key = info['key'];
-      for (String cdn in real_url.keys) {
-        real_url[cdn]['原画'] = 'http://$cdn-tct.douyucdn.cn/live/$key.flv?uuid=';
-        real_url[cdn]['流畅'] =
+      for (String cdn in realUrl.keys) {
+        realUrl[cdn]['原画'] = 'http://$cdn-tct.douyucdn.cn/live/$key.flv?uuid=';
+        realUrl[cdn]['流畅'] =
             'http://$cdn-tct.douyucdn.cn/live/${key}_900.flv?uuid=';
       }
     }
-    return real_url;
+    return realUrl;
   }
 
   Future<String> verifyLink() async {

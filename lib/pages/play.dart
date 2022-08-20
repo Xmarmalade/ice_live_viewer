@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dart_vlc/dart_vlc.dart';
+import 'package:ice_live_viewer/widgets/douyudanmaku.dart';
 import 'package:ice_live_viewer/widgets/videoframe.dart';
 import 'package:ice_live_viewer/widgets/bilibilianmaku.dart';
 import 'package:ice_live_viewer/widgets/huyadanmaku.dart';
@@ -40,7 +41,9 @@ class _StreamPlayerState extends State<StreamPlayer> {
         LiveVideoFrame(videoWidget: nativeVideo, player: streamPlayer);
     final danmakuListView = widget.type == 'huya'
         ? HuyaDanmakuListView(danmakuId: widget.danmakuId)
-        : BilibiliDanmakuListView(roomId: widget.danmakuId);
+        : (widget.type == 'bilibili'
+            ? BilibiliDanmakuListView(roomId: widget.danmakuId)
+            : DouYuDanmakuListView(roomId: widget.danmakuId));
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(

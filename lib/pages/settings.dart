@@ -40,7 +40,7 @@ class SettingsPage extends StatelessWidget {
             title: 'Experimental',
           ),
           const SwitchTile(
-            title: 'Use Native Player',
+            title: '[Unrealized] Use Native Player',
             subtitle:
                 'This setup only uses Win32 APIs & no texture, intermediate buffers or copying of pixel buffers.',
             settingKey: 'use_native_player',
