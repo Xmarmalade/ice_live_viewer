@@ -35,7 +35,7 @@ dependencies:
   dart_vlc:
     git:
       url: https://github.com/iiijam/dart_vlc.git
-      ref: master
+      ref: thin-vlc
   web_socket_channel: ^2.2.0
   url_launcher: ^6.1.5
   # The following adds the Cupertino Icons font to your application.
