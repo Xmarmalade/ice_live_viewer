@@ -15,8 +15,6 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('IceLiveViewer'),
-        titleSpacing: 5,
-        leadingWidth: 68,
       ),
       body: const ListViewFutureBuilder(),
       drawer: const HomeDrawer(),
@@ -280,7 +278,7 @@ class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
             } else if (snapshot.hasData) {
               final Object? links = snapshot.data;
               int count = (links as Map<String, dynamic>).length;
-              debugPrint(snapshot.data.toString());
+              //debugPrint(snapshot.data.toString());
               if (count == 0) {
                 return Center(
                   child: Column(
@@ -303,21 +301,19 @@ class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
                 );
               }
               return ListView.builder(
-                //shrinkWrap: true,
+                shrinkWrap: true,
+                itemExtent: 65.0,
                 itemCount: count,
                 itemBuilder: (context, index) {
                   int indexNum = index + 1;
                   String url = (links)['$indexNum'].toString();
                   String type = LinkParser().checkType(url);
                   if (type == 'huya') {
-                    return SizedBox(
-                        child: HuyaFutureListTileSkeleton(url: url));
+                    return HuyaFutureListTileSkeleton(url: url);
                   } else if (type == 'bilibili') {
-                    return SizedBox(
-                        child: BilibiliFutureListTileSkeleton(url: url));
+                    return BilibiliFutureListTileSkeleton(url: url);
                   } else if (type == 'douyu') {
-                    return SizedBox(
-                        child: DouyuFutureListTileSkeleton(url: url));
+                    return DouyuFutureListTileSkeleton(url: url);
                   } else {
                     return ErrorListTile(
                       error: type,
