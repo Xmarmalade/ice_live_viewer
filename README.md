@@ -21,9 +21,8 @@ A Flutter project can make you watch live with ease.
 - Get the address of the live room from multiple CDNs and qualities 选择不同的线路和质量
 
 ## Screenshots
-
-<img width="1280" alt="OLD-IMAGE" src="https://user-images.githubusercontent.com/16839488/169522945-eeb5d2b7-019e-481c-8149-94f50d36ea4b.png">
-<img width="1280" alt="CUR-IMAGE" src="https://user-images.githubusercontent.com/16839488/179977506-6b23baa2-50a8-4df5-85b3-5c80beaf1bc0.png">
+<img width="1040" alt="屏幕截图 2022-08-21 173645" src="https://user-images.githubusercontent.com/16839488/185785310-7a21dc36-fa9c-493a-a06e-149fb577714b.png">
+<img width="1280" alt="屏幕截图 2022-08-21 174302" src="https://user-images.githubusercontent.com/16839488/185785381-964cfcf8-716a-432f-8bfe-664ef23d90e6.png">
 
 ## Platforms
 - [x] BILIBILI
