@@ -642,6 +642,7 @@ class DouyuOnlineListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('Douyu:$liveInfo');
     return ListTile(
       leading: CircleAvatar(
         backgroundImage: NetworkImage(liveInfo['avatar']),
@@ -785,6 +786,12 @@ class DouyuOnlineListTile extends StatelessWidget {
                 ],
               );
             });
+      },
+      onLongPress: () {
+        Clipboard.setData(ClipboardData(text: rawLink));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Copied to clipboard'),
+            duration: Duration(milliseconds: 500)));
       },
     );
   }
