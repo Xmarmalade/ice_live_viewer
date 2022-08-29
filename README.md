@@ -1,4 +1,6 @@
 # ice_live_viewer
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fiiijam%2Fice_live_viewer.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fiiijam%2Fice_live_viewer?ref=badge_shield)
+
 
 <img width="100" alt="image" src="https://user-images.githubusercontent.com/16839488/159170616-6633b2c9-0b33-4dd1-9de4-b73b9d70eca4.png">
 
@@ -48,3 +50,7 @@ Bilibili `https://*.bilibili.com/<房间号>`
 
 ### 部分链接无法播放
 你可以尝试在其它播放器播放，如果是vlc相关问题请提[issue](https://github.com/iiijam/ice_live_viewer/issues/new/choose)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fiiijam%2Fice_live_viewer.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fiiijam%2Fice_live_viewer?ref=badge_large)
