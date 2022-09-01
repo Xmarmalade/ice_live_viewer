@@ -1,17 +1,23 @@
-class LiveRooom {
-  String? id;
-  String? name;
-  String? platform;
-  String? cover;
-  String? title;
-  bool? isLive = false;
+class SingleRoom {
+  final String roomId;
+  final String title;
+  final String nick;
+  final String avatar;
+  final String liveStatus;
 
-  LiveRooom({
-    required this.id,
-    required this.platform,
-    this.cover,
-    this.name,
-    this.title,
-    this.isLive,
-  });
+  SingleRoom(this.roomId, this.title, this.nick, this.avatar, this.liveStatus);
+
+  SingleRoom.fromJson(Map<String, dynamic> json)
+      : roomId = json['roomId'],
+        title = json['title'],
+        nick = json['nick'],
+        avatar = json['avatar'],
+        liveStatus = json['liveStatus'];
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'roomId': roomId,
+        'title': title,
+        'nick': nick,
+        'avatar': avatar,
+        'liveStatus': liveStatus,
+      };
 }

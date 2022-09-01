@@ -106,7 +106,6 @@ Future<bool> switchPref(String key) async {
 
 Future<bool> getSwitchPref(String key) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-
-  //debugPrint('$key is ${prefs.getBool(key)}');
-  return prefs.getBool(key)!;
+  debugPrint('$key is ${prefs.getBool(key) ?? false}');
+  return prefs.getBool(key) ?? false;
 }

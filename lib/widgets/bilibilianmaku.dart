@@ -5,7 +5,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:ice_live_viewer/utils/bilibiliparser.dart';
+import 'package:ice_live_viewer/utils/http/bilibiliparser.dart';
 import 'package:web_socket_channel/io.dart';
 
 /// https://github.com/Ha2ryZhang/alltv_flutter/blob/master/lib/model/bilibili_host_server.dart
