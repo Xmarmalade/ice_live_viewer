@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:ice_live_viewer/dart_tars_protocol/tars_output_stream.dart';
-import 'package:ice_live_viewer/dart_tars_protocol/tars_input_stream.dart';
-import 'package:ice_live_viewer/dart_tars_protocol/tars_struct.dart';
+import 'package:ice_live_viewer/utils/dart_tars_protocol/tars_output_stream.dart';
+import 'package:ice_live_viewer/utils/dart_tars_protocol/tars_input_stream.dart';
+import 'package:ice_live_viewer/utils/dart_tars_protocol/tars_struct.dart';
 
 // credit https://github.com/xiaoyaocz/dart_tars_protocol
 

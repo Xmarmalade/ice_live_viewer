@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:ice_live_viewer/utils/tarscodec.dart';
+import 'package:ice_live_viewer/utils/dart_tars_protocol/tarscodec.dart';
 import 'package:web_socket_channel/io.dart';
 
 class HuyaDanmakuListView extends StatefulWidget {
