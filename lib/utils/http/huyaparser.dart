@@ -17,14 +17,9 @@ Future<Map<String, dynamic>> _getFromHuyaApi(String roomId) async {
   return json['data'];
 }
 
-Future<Map<String, dynamic>> getFromUnofficialApi(String roomId) async {
-  var resp = await http.get(
-    Uri.parse('https://ice-live-api.vercel.app/huya/$roomId'),
-    headers: {
-      'User-Agent':
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
-    },
-  );
+Future<Map<String, dynamic>> getFromUnofficialApi(
+    String liveApiUrl, String roomId) async {
+  var resp = await http.get(Uri.parse('https://$liveApiUrl/huya/$roomId'));
   if (resp.statusCode == 200) {
     return jsonDecode(resp.body)['data'];
   } else {

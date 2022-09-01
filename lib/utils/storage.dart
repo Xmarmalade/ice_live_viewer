@@ -94,7 +94,6 @@ Future<bool> deleteData(String key) async {
 } */
 
 Future<bool> switchPref(String key) async {
-  //TODO: init
   SharedPreferences prefs = await SharedPreferences.getInstance();
   if (prefs.getBool(key) == true) {
     //debugPrint('$key true -> false');
@@ -107,7 +106,6 @@ Future<bool> switchPref(String key) async {
 
 Future<bool> getSwitchPref(String key) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-
-  //debugPrint('$key is ${prefs.getBool(key)}');
-  return prefs.getBool(key)!;
+  debugPrint('$key is ${prefs.getBool(key) ?? false}');
+  return prefs.getBool(key) ?? false;
 }
