@@ -22,7 +22,7 @@ class Douyu {
         headers: headers,
         body: data);
     var body = json.decode(resp.body);
-    print(body);
+    //print(body);
     if (body['error'] == 0) {
       String rtmpLive = body['data']['rtmp_live'];
       RegExpMatch? match =
@@ -109,7 +109,7 @@ class Douyu {
   Future<Map<String, dynamic>> getRoomFullInfo() async {
     //try to get room basic info, if error, try to fix the room id
     Map roomBasicInfo = await _getRoomBasicInfo();
-    print(roomBasicInfo);
+    //print(roomBasicInfo);
     dynamic liveStatus = roomBasicInfo['room_status'];
     Map<String, dynamic> data = {
       'name': roomBasicInfo['owner_name'],

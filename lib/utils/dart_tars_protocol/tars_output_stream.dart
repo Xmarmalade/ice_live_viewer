@@ -154,11 +154,11 @@ class TarsOutputStream {
     }
     //int64
     //紧跟8个字节整型数据
-    if (n >= -9223372036854775808 && n <= 9223372036854775807) {
-      writeHead(TarsStructType.LONG.index, tag);
-      bw.writeInt(n, 8);
-      return;
-    }
+    // if (n >= -9223372036854775808 && n <= 9223372036854775807) {
+    //   writeHead(TarsStructType.LONG.index, tag);
+    //   bw.writeInt(n, 8);
+    //   return;
+    // }
   }
 
   /// 写入浮点数

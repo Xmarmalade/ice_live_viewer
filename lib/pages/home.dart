@@ -65,7 +65,6 @@ class FloatingButton extends StatelessWidget {
                           return FutureBuilder(
                               future: LinkParser()
                                   .formatUrl(linkTextController.text),
-                              //.then((value) => storage.saveSingleLink(value)),
                               builder: (context, snapshot) {
                                 if (snapshot.hasError) {
                                   return AlertDialog(

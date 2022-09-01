@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ice_live_viewer/pages/danmaku.dart';
 import 'package:ice_live_viewer/pages/home.dart';
-import 'package:ice_live_viewer/pages/play.dart';
-import 'package:ice_live_viewer/utils/bilibiliparser.dart' as bilibili;
-import 'package:ice_live_viewer/utils/huyaparser.dart' as huya;
-import 'package:ice_live_viewer/utils/douyuparser.dart';
+import 'package:ice_live_viewer/pages/play.dart'
+    if (dart.library.html) 'package:ice_live_viewer/pages/webplay.dart';
+import 'package:ice_live_viewer/utils/http/bilibiliparser.dart' as bilibili;
+import 'package:ice_live_viewer/utils/http/huyaparser.dart' as huya;
+import 'package:ice_live_viewer/utils/http/douyuparser.dart';
 import 'package:ice_live_viewer/utils/keepalivewrapper.dart';
 import 'package:ice_live_viewer/utils/linkparser.dart';
 import 'package:ice_live_viewer/utils/storage.dart' as storage;
+import 'package:ice_live_viewer/model/liveroom.dart';
 
 class HuyaFutureListTileSkeleton extends StatelessWidget {
   const HuyaFutureListTileSkeleton({
@@ -96,13 +98,6 @@ class HuyaOnlineListTile extends StatelessWidget {
                 String cdnName = cdn;
                 Map cdnLinkMap = linkList[cdn];
                 String cdnLink = cdnLinkMap['原画'];
-/*                 String fhdLink =
-                    cdnLink.replaceAll('imgplus.flv', 'imgplus_4000.flv');
-                String hdLink =
-                    cdnLink.replaceAll('imgplus.flv', 'imgplus_2000.flv');
-                String sdLink =
-                    cdnLink.replaceAll('imgplus.flv', 'imgplus_1500.flv'); */
-                //给定的清晰度
                 List<PopupMenuEntry<String>> givenResolution = [];
                 for (String reso in cdnLinkMap.keys) {
                   givenResolution.add(
@@ -112,21 +107,6 @@ class HuyaOnlineListTile extends StatelessWidget {
                     ),
                   );
                 }
-                /* //自定的清晰度
-                List<PopupMenuEntry<String>> customResolution = [
-                  PopupMenuItem(
-                    value: fhdLink,
-                    child: const Text('1080P'),
-                  ),
-                  PopupMenuItem(
-                    value: hdLink,
-                    child: const Text('720P'),
-                  ),
-                  PopupMenuItem(
-                    value: sdLink,
-                    child: const Text('540P'),
-                  ),
-                ]; */
                 cdnListTiles.add(
                   ListTile(
                     leading: Text(cdnName),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ice_live_viewer/utils/checkupdate.dart';
+import 'package:ice_live_viewer/utils/http/checkupdate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class About extends StatelessWidget {
@@ -122,7 +122,7 @@ class About extends StatelessWidget {
 }
 
 Future<void> _launchUrl(_url) async {
-  print('launching $_url');
+  //print('launching $_url');
   if (!await launchUrl(Uri.parse(_url))) {
     throw 'Could not launch $_url';
   }

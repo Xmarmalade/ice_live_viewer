@@ -1,11 +1,11 @@
-import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:ice_live_viewer/pages/home.dart';
 import 'package:ice_live_viewer/utils/theme.dart';
+import 'package:ice_live_viewer/utils/init/ioinit.dart'
+    if (dart.library.html) 'package:ice_live_viewer/utils/init/htmlinit.dart';
 
 void main() {
-  DartVLC.initialize(useFlutterNativeView: false);
-  runApp(const MyApp());
+  init();
 }
 
 class MyApp extends StatelessWidget {
