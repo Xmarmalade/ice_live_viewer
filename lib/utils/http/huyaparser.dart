@@ -17,18 +17,6 @@ Future<Map<String, dynamic>> _getFromHuyaApi(String roomId) async {
   return json['data'];
 }
 
-/* Future<Map<String, dynamic>> _getFromUnofficialApi(
-    String api, String roomId) async {
-  var resp = await http.get(
-    Uri.parse('$api/$roomId'),
-    headers: {
-      'User-Agent':
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148'
-    },
-  );
-  return json.decode(resp.body)['data'];
-} */
-
 Future<Map<String, dynamic>> getFromUnofficialApi(
     String liveApiUrl, String roomId) async {
   var resp = await http.get(Uri.parse('https://$liveApiUrl/huya/$roomId'));
@@ -79,6 +67,7 @@ Future<Map<String, dynamic>> getLiveInfo(String url) async {
   } else {
     int lUid = roomInfo['profileInfo']['uid'];
     String cover = roomInfo['liveData']['screenshot'];
+    //TODO fix cover 403
     Map streamDict = roomInfo['stream']['flv'];
     List multiLine = streamDict['multiLine'];
     List rateArray = streamDict['rateArray'];
@@ -94,6 +83,7 @@ Future<Map<String, dynamic>> getLiveInfo(String url) async {
 
     for (Map item in multiLine) {
       String url = item['url'];
+      url = url.replaceAll('http://', 'https://');
       String cdnType = item['cdnType'];
       Map cdnLinks = {};
       cdnLinks['原画'] = url;
