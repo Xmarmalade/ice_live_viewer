@@ -1,11 +1,12 @@
 {
-    "name": "ice_live_viewer",
-    "short_name": "ice_live_viewer",
+    "name": "Ice Live Viewer",
+    "short_name": "iceliveviewer",
     "start_url": ".",
     "display": "standalone",
+    "lang": "en-US",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "A Flutter project to get livestreams.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
