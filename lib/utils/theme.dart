@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MyTheme {
   ThemeData lightThemeData = ThemeData(
-      primarySwatch: Colors.purple,
+      primarySwatch: Colors.indigo,
       useMaterial3: true,
       textTheme: const TextTheme(
         headline1: TextStyle(
@@ -18,18 +18,22 @@ class MyTheme {
       ));
 
   ThemeData darkThemeData = ThemeData.from(
-      colorScheme: const ColorScheme.dark(),
+      colorScheme: const ColorScheme.dark(
+        primary: Colors.indigo,
+        secondary: Colors.indigo,
+        brightness: Brightness.dark,
+      ),
       useMaterial3: true,
       textTheme: const TextTheme(
         headline1: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
-          color: Color(0xFFAC7BE8),
+          color: Colors.indigo,
         ),
         headline2: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Color(0xFFAC7BE8),
+          color: Colors.indigo,
         ),
       ));
 }
