@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ice_live_viewer/pages/danmaku.dart';
 import 'package:ice_live_viewer/pages/home.dart';
-import 'package:ice_live_viewer/pages/play.dart'
+import 'package:ice_live_viewer/pages/desktopplay.dart'
     if (dart.library.html) 'package:ice_live_viewer/pages/webplay.dart';
 import 'package:ice_live_viewer/utils/http/bilibiliparser.dart' as bilibili;
 import 'package:ice_live_viewer/utils/http/huyaparser.dart' as huya;

@@ -55,7 +55,6 @@ class HomePageGridView extends StatelessWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.all(10),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        childAspectRatio: 17 / 13,
         crossAxisCount: screenWidth > 1280
             ? 4
             : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
@@ -91,44 +90,34 @@ class HomePageGridView extends StatelessWidget {
                 AspectRatio(
                   aspectRatio: 16 / 9,
                   child: Card(
-                    margin: const EdgeInsets.fromLTRB(10, 5, 10, 2),
+                    margin: EdgeInsets.all(0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     color: Theme.of(context).highlightColor,
-                    child: const Center(
+                    child: Center(
                       child: Text("Image"),
                     ),
                   ),
                 ),
-                AspectRatio(
-                  aspectRatio: 16 / 3,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      //radius: 24,
-                      backgroundColor: Theme.of(context).highlightColor,
-                    ),
-                    title: Text(
-                      "Title",
-                      //style: Theme.of(context).textTheme.headline6,
-                    ),
-                    subtitle: Text(
-                      "${counter.rooms[index]}",
-                      //style: Theme.of(context).textTheme.subtitle1,
-                    ),
-                    trailing: Text(
-                      "Live",
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
+                ListTile(
+                  leading: CircleAvatar(
+                    //radius: 24,
+                    backgroundColor: Theme.of(context).highlightColor,
+                  ),
+                  title: Text(
+                    "Title",
+                    //style: Theme.of(context).textTheme.headline6,
+                  ),
+                  subtitle: Text(
+                    "${counter.rooms[index]}",
+                    //style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                  trailing: Text(
+                    "Live",
+                    style: Theme.of(context).textTheme.subtitle1,
                   ),
                 ),
-
-                // children: [
-                //   const CircleAvatar(
-                //     radius: 28,
-                //     backgroundColor: Colors.blueAccent,
-                //   )
-                // ],
               ],
             ),
           ),
