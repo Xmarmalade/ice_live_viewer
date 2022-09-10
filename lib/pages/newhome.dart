@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 
 class NewHome extends StatelessWidget {
@@ -30,7 +31,7 @@ class _HomePageScaffoldState extends State<HomePageScaffold> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text("$screenWidth"),
+        title: const Text("New Home Preview"),
       ),
       floatingActionButton:
           HomePageAddButton(controller: controller, counter: counter),
@@ -51,18 +52,14 @@ class HomePageGridView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      padding: const EdgeInsets.all(10),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: screenWidth > 1280
-            ? 4
-            : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
-      ),
+    return MasonryGridView.count(
+      crossAxisCount: screenWidth > 1280
+          ? 4
+          : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
       itemCount: counter.rooms.length,
       itemBuilder: (context, index) {
         return Card(
-          elevation: 3,
+          elevation: 5,
           margin: const EdgeInsets.fromLTRB(7.5, 7.5, 7.5, 7.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
@@ -90,12 +87,12 @@ class HomePageGridView extends StatelessWidget {
                 AspectRatio(
                   aspectRatio: 16 / 9,
                   child: Card(
-                    margin: EdgeInsets.all(0),
+                    margin: const EdgeInsets.all(0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     color: Theme.of(context).highlightColor,
-                    child: Center(
+                    child: const Center(
                       child: Text("Image"),
                     ),
                   ),
@@ -105,12 +102,12 @@ class HomePageGridView extends StatelessWidget {
                     //radius: 24,
                     backgroundColor: Theme.of(context).highlightColor,
                   ),
-                  title: Text(
+                  title: const Text(
                     "Title",
                     //style: Theme.of(context).textTheme.headline6,
                   ),
                   subtitle: Text(
-                    "${counter.rooms[index]}",
+                    counter.rooms[index],
                     //style: Theme.of(context).textTheme.subtitle1,
                   ),
                   trailing: Text(
