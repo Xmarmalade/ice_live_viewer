@@ -1,4 +1,4 @@
-package com.example.ice_live_viewer
+package com.iiijam.iceliveviewer
 
 import io.flutter.embedding.android.FlutterActivity
 
