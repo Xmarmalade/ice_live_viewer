@@ -10,7 +10,6 @@ import 'package:ice_live_viewer/utils/http/douyuparser.dart';
 import 'package:ice_live_viewer/utils/keepalivewrapper.dart';
 import 'package:ice_live_viewer/utils/linkparser.dart';
 import 'package:ice_live_viewer/utils/storage.dart' as storage;
-import 'package:ice_live_viewer/model/liveroom.dart';
 
 class HuyaFutureListTileSkeleton extends StatelessWidget {
   const HuyaFutureListTileSkeleton({
@@ -622,7 +621,6 @@ class DouyuOnlineListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Douyu:$liveInfo');
     return ListTile(
       leading: CircleAvatar(
         backgroundImage: NetworkImage(liveInfo['avatar']),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
+import 'package:ice_live_viewer/model/liveroom.dart';
 
 class NewHome extends StatelessWidget {
   const NewHome({Key? key}) : super(key: key);
@@ -30,12 +31,17 @@ class _HomePageScaffoldState extends State<HomePageScaffold> {
     TextEditingController controller = TextEditingController();
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("New Home Preview"),
-      ),
+      appBar: AppBar(title: const Text("New Home Preview"), actions: [
+        IconButton(
+            onPressed: () {
+              counter.hideOfflineRooms();
+            },
+            tooltip: 'Hide Offline Rooms',
+            icon: const Icon(Icons.hide_source_rounded)),
+      ]),
       floatingActionButton:
           HomePageAddButton(controller: controller, counter: counter),
-      body: HomePageGridView(screenWidth: screenWidth, counter: counter),
+      body: HomePageGridView(screenWidth: screenWidth, roomNotifier: counter),
     );
   }
 }
@@ -44,11 +50,11 @@ class HomePageGridView extends StatelessWidget {
   const HomePageGridView({
     Key? key,
     required this.screenWidth,
-    required this.counter,
+    required this.roomNotifier,
   }) : super(key: key);
 
   final double screenWidth;
-  final RoomsNotifier counter;
+  final RoomsNotifier roomNotifier;
 
   @override
   Widget build(BuildContext context) {
@@ -56,70 +62,135 @@ class HomePageGridView extends StatelessWidget {
       crossAxisCount: screenWidth > 1280
           ? 4
           : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
-      itemCount: counter.rooms.length,
+      itemCount: roomNotifier.singleRoomsList.length,
       itemBuilder: (context, index) {
-        return Card(
-          elevation: 5,
-          margin: const EdgeInsets.fromLTRB(7.5, 7.5, 7.5, 7.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(15.0),
-            onTap: () => showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                      title: Text("Item $index"),
-                      content: Text(counter.rooms[index]),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            counter.removeRooms(counter.rooms[index]);
-                            return Navigator.pop(context);
-                          },
-                          child: const Text("Remove"),
-                        ),
-                      ],
-                    )),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: Card(
-                    margin: const EdgeInsets.all(0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    color: Theme.of(context).highlightColor,
-                    child: const Center(
-                      child: Text("Image"),
-                    ),
-                  ),
+        if (roomNotifier.singleRoomsList.isNotEmpty) {
+          SingleRoom room = roomNotifier.singleRoomsList[index];
+          return RoomCard(room: room, counter: roomNotifier, index: index);
+        } else {
+          return Column(
+            mainAxisSize: MainAxisSize.max,
+            children: const [
+              Align(
+                alignment: AlignmentDirectional(0, 0),
+                child: Icon(
+                  Icons.post_add_outlined,
+                  size: 64,
                 ),
-                ListTile(
-                  leading: CircleAvatar(
-                    //radius: 24,
-                    backgroundColor: Theme.of(context).highlightColor,
-                  ),
-                  title: const Text(
-                    "Title",
-                    //style: Theme.of(context).textTheme.headline6,
-                  ),
-                  subtitle: Text(
-                    counter.rooms[index],
-                    //style: Theme.of(context).textTheme.subtitle1,
-                  ),
-                  trailing: Text(
-                    "Live",
-                    style: Theme.of(context).textTheme.subtitle1,
-                  ),
+              ),
+              Expanded(
+                child: Text(
+                  'Hello World',
                 ),
-              ],
-            ),
-          ),
-        );
+              ),
+            ],
+          );
+        }
       },
+    );
+  }
+}
+
+class RoomCard extends StatelessWidget {
+  const RoomCard({
+    Key? key,
+    required this.room,
+    required this.counter,
+    required this.index,
+  }) : super(key: key);
+
+  final SingleRoom room;
+  final RoomsNotifier counter;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5,
+      margin: const EdgeInsets.fromLTRB(7.5, 7.5, 7.5, 7.5),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15.0),
+        onTap: () => showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: Text(room.title),
+                  content: Text(room.roomId),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        counter.removeSingleRooms(index);
+                        return Navigator.pop(context);
+                      },
+                      child: const Text("Remove"),
+                    ),
+                  ],
+                )),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Card(
+                  margin: const EdgeInsets.all(0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  color: Theme.of(context).focusColor,
+                  elevation: 0,
+                  child: room.liveStatus == 'ON'
+                      ? Image.network(
+                          room.cover,
+                          loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          },
+                          errorBuilder: (context, error, stackTrace) => Center(
+                              child: Text.rich(TextSpan(children: [
+                            TextSpan(
+                                text: '${error.toString()}\n',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 10)),
+                            TextSpan(text: stackTrace.toString())
+                          ]))),
+                        )
+                      : const Center(
+                          child: Text(
+                            "Offline",
+                            style: TextStyle(fontSize: 32),
+                          ),
+                        )),
+            ),
+            ListTile(
+              leading: CircleAvatar(
+                foregroundImage: NetworkImage(room.avatar),
+                radius: 20,
+                backgroundColor: Theme.of(context).errorColor,
+              ),
+              title: Text(
+                room.title,
+                maxLines: 1,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              subtitle: Text(
+                room.nick,
+                maxLines: 1,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+              trailing: Text(
+                room.platform,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
@@ -149,7 +220,7 @@ class HomePageAddButton extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () {
-                    counter.addRooms(controller.text);
+                    counter.addSingleRoom(controller.text);
                     Navigator.pop(context);
                   },
                   child: const Text("Add"),
@@ -165,16 +236,76 @@ class HomePageAddButton extends StatelessWidget {
 }
 
 class RoomsNotifier with ChangeNotifier {
-  List<String> rooms = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+  List<SingleRoom> singleRoomsList = [
+    SingleRoom.fromJson({
+      "avatar":
+          "https://huyaimg.msstatic.com/avatar/1010/66/6aba6b4323ab3c52960e7bf169d08e_180_135.jpg?1653400276",
+      "cover":
+          "https://anchorpost.msstatic.com/cdnimage/anchorpost/1010/66/6aba6b4323ab3c52960e7bf169d08e_2336_1662655848.jpg",
+      "liveStatus": "ON",
+      "nick": "KPL职业联赛",
+      "roomId": "660002",
+      "title": "【重播】9.10 17:00 重庆狼队 vs 广州TTG"
+    }),
+    SingleRoom.fromJson(
+      {
+        "avatar":
+            "https://huyaimg.msstatic.com/avatar/1034/77/a4286776aa02881faa959bbb2a94d5_180_135.jpg?1598180690",
+        "liveStatus": "OFF",
+        "cover": "",
+        "nick": "久爱-预见【吕德华】",
+        "roomId": "243547",
+        "title": "儒雅少年 血洗巅峰冲2500"
+      },
+    ),
+    SingleRoom.fromJson(
+      {
+        "avatar":
+            "https://huyaimg.msstatic.com/avatar/1087/cb/ab41300582958653660b6620e05fd1_180_135.jpg?1577343415",
+        "cover":
+            "https://live-cover.msstatic.com/huyalive/1610145122-1610145122-6915520640803930112-3220413700-10057-A-0-1-imgplus/20220910155139.jpg?streamName=1610145122-1610145122-6915520640803930112-3220413700-10057-A-0-1-imgplus&interval=10",
+        "links": {},
+        "liveStatus": "ON",
+        "nick": "LING-树叶",
+        "roomId": "296191",
+        "title": "祝大家中秋团圆"
+      },
+    ),
+    SingleRoom.fromJson(
+      {
+        "avatar":
+            "https://huyaimg.msstatic.com/avatar/1086/bf/fd6f69d69c0015eaface1f6024869e_180_135.jpg?1619540458",
+        "cover":
+            "https://live-cover.msstatic.com/huyalive/294636272-294636272-1265453152455360512-589396000-10057-A-0-1-imgplus/20220910152837.jpg?streamName=294636272-294636272-1265453152455360512-589396000-10057-A-0-1-imgplus&interval=10",
+        "liveStatus": "ON",
+        "nick": "狂鸟丶楚河-90327",
+        "roomId": "998",
+        "title": "新主播，第一天直播，什么游戏都播"
+      },
+    ),
+  ];
 
-  void addRooms(String room) {
-    rooms.add(room);
-    print('huyaRooms: $rooms');
+  void addSingleRoom(String roomId) {
+    SingleRoom sgroom = SingleRoom(roomId);
+    singleRoomsList.add(sgroom);
     notifyListeners();
   }
 
-  void removeRooms(String room) {
-    rooms.remove(room);
+  void removeSingleRooms(int index) {
+    singleRoomsList.removeAt(index);
     notifyListeners();
   }
+
+  void hideOfflineRooms() {
+    for (int i = 0; i < singleRoomsList.length; i++) {
+      if (singleRoomsList[i].liveStatus != 'ON') {
+        singleRoomsList.removeAt(i);
+      }
+    }
+    notifyListeners();
+  }
+
+/*   Future<void> getRoomsFromLocalStorage() {
+
+  } */
 }
