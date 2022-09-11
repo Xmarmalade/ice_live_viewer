@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:ice_live_viewer/utils/keepalivewrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:ice_live_viewer/model/liveroom.dart';
 
@@ -90,15 +91,18 @@ class HomePageGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (roomNotifier.singleRoomsList.isNotEmpty) {
-      return MasonryGridView.count(
-          crossAxisCount: screenWidth > 1280
-              ? 4
-              : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
-          itemCount: roomNotifier.singleRoomsList.length,
-          itemBuilder: (context, index) {
-            SingleRoom room = roomNotifier.singleRoomsList[index];
-            return RoomCard(room: room, counter: roomNotifier, index: index);
-          });
+      return KeepAliveWrapper(
+        child: MasonryGridView.count(
+            crossAxisCount: screenWidth > 1280
+                ? 4
+                : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
+            itemCount: roomNotifier.singleRoomsList.length,
+            physics: (const BouncingScrollPhysics()),
+            itemBuilder: (context, index) {
+              SingleRoom room = roomNotifier.singleRoomsList[index];
+              return RoomCard(room: room, counter: roomNotifier, index: index);
+            }),
+      );
     } else {
       return const HomeEmptyScreen();
     }
@@ -194,6 +198,7 @@ class RoomCard extends StatelessWidget {
                   child: room.liveStatus == 'ON'
                       ? Image.network(
                           room.cover,
+                          fit: BoxFit.fill,
                           loadingBuilder: (BuildContext context, Widget child,
                               ImageChunkEvent? loadingProgress) {
                             if (loadingProgress == null) return child;
@@ -314,7 +319,6 @@ class RoomsNotifier with ChangeNotifier {
             "https://huyaimg.msstatic.com/avatar/1087/cb/ab41300582958653660b6620e05fd1_180_135.jpg?1577343415",
         "cover":
             "https://live-cover.msstatic.com/huyalive/1610145122-1610145122-6915520640803930112-3220413700-10057-A-0-1-imgplus/20220910155139.jpg?streamName=1610145122-1610145122-6915520640803930112-3220413700-10057-A-0-1-imgplus&interval=10",
-        "links": {},
         "liveStatus": "ON",
         "nick": "LING-树叶",
         "roomId": "296191",
@@ -333,6 +337,29 @@ class RoomsNotifier with ChangeNotifier {
         "title": "新主播，第一天直播，什么游戏都播"
       },
     ),
+    SingleRoom.fromJson(
+      {
+        "avatar":
+            "https://apic.douyucdn.cn/upload/avatar_v3/202209/f71f86fa2cc1474b9914452379fdcfc1_big.jpg",
+        "cover":
+            "https://rpic.douyucdn.cn/live-cover/roomCove_coverUpdate_2022-09-10_84f3e2e4019598aad12bf33c3fa00167.jpg/dy1",
+        "liveStatus": "ON",
+        "nick": "王者荣耀官方赛事",
+        "roomId": "1863767",
+        "title": "预告丨13日 EMC vs GOG"
+      },
+    ),
+    SingleRoom.fromJson(
+      {
+        "avatar":
+            "https://apic.douyucdn.cn/upload/avatar_v3/202206/c7084e1e66ed4195a379cddd4b2bce1b_big.jpg",
+        "cover": "https://rpic.douyucdn.cn/asrpic/220820/6_1901.png/dy1",
+        "liveStatus": "OFF",
+        "nick": "斗鱼官方直播",
+        "roomId": "6",
+        "title": "20日16点 比亚迪汽车王者荣耀高校赛"
+      },
+    )
   ];
 
   void addSingleRoom(String roomId) {
