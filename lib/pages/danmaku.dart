@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ice_live_viewer/widgets/douyudanmaku.dart';
 import 'package:ice_live_viewer/widgets/huyadanmaku.dart';
 import 'package:ice_live_viewer/widgets/bilibilianmaku.dart';
 
@@ -28,10 +29,8 @@ class PureDanmaku extends StatelessWidget {
       body: type == 'bilibili'
           ? BilibiliDanmakuListView(roomId: danmakuId)
           : (type == 'huya'
-              ? HuyaDanmakuListView(
-                  danmakuId: danmakuId,
-                )
-              : const Text('error')),
+              ? HuyaDanmakuListView(danmakuId: danmakuId)
+              : DouYuDanmakuListView(roomId: danmakuId)),
     );
   }
 }
