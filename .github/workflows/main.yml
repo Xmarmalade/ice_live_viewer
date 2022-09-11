@@ -56,6 +56,7 @@ jobs:
       - name: Upload Release Asset
         uses: actions/upload-artifact@v3
         with:
+          name: artifact-windows
           path: build/windows/runner/Release/IceLiveViewer-${{github.ref_name}}-windows.zip
 
 
@@ -99,5 +100,6 @@ jobs:
       - name: Upload Release Asset
         uses: actions/upload-artifact@v3
         with:
+          name: artifact-android
           path: build/app/outputs/flutter-apk/IceLiveViewer-${{github.ref_name}}-android.apk
 
