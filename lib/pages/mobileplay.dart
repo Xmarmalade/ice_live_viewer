@@ -4,6 +4,7 @@ import 'package:ice_live_viewer/widgets/huyadanmaku.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:ice_live_viewer/widgets/douyudanmaku.dart';
+import 'package:wakelock/wakelock.dart';
 
 class MobilePlayer extends StatefulWidget {
   const MobilePlayer(
@@ -45,6 +46,8 @@ class _MobilePlayerState extends State<MobilePlayer> {
 
   @override
   Widget build(BuildContext context) {
+    Wakelock.enable();
+    Wakelock.enabled.then((value) => print('Wakelock:$value'));
     final ratio =
         MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
 
@@ -69,33 +72,43 @@ class _MobilePlayerState extends State<MobilePlayer> {
         : (widget.type == 'bilibili'
             ? BilibiliDanmakuListView(roomId: widget.danmakuId)
             : DouYuDanmakuListView(roomId: widget.danmakuId));
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+    return WillPopScope(
+      onWillPop: () async {
+        _controller.pause();
+        Wakelock.disable();
+        Wakelock.enabled.then((value) => print('Wakelock:$value'));
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+              Wakelock.disable();
+              Wakelock.enabled.then((value) => print('Wakelock:$value'));
+            },
+          ),
+          title: Text(widget.title),
         ),
-        title: Text(widget.title),
+        body: ratio > 1.2
+            ? Row(
+                children: <Widget>[
+                  nativeVideo,
+                  Expanded(
+                    child: danmakuListView,
+                  ),
+                ],
+              )
+            : Column(
+                children: <Widget>[
+                  nativeVideo,
+                  Expanded(
+                    child: danmakuListView,
+                  ),
+                ],
+              ),
       ),
-      body: ratio > 1.2
-          ? Row(
-              children: <Widget>[
-                nativeVideo,
-                Expanded(
-                  child: danmakuListView,
-                ),
-              ],
-            )
-          : Column(
-              children: <Widget>[
-                nativeVideo,
-                Expanded(
-                  child: danmakuListView,
-                ),
-              ],
-            ),
     );
   }
 }

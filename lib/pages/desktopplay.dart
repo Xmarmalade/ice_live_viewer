@@ -4,6 +4,7 @@ import 'package:ice_live_viewer/widgets/douyudanmaku.dart';
 import 'package:ice_live_viewer/widgets/videoframe.dart';
 import 'package:ice_live_viewer/widgets/bilibilianmaku.dart';
 import 'package:ice_live_viewer/widgets/huyadanmaku.dart';
+import 'package:wakelock/wakelock.dart';
 
 class VlcPlayer extends StatefulWidget {
   const VlcPlayer(
@@ -34,6 +35,8 @@ class _VlcPlayerState extends State<VlcPlayer> {
 
   @override
   Widget build(BuildContext context) {
+    Wakelock.enable();
+    Wakelock.enabled.then((value) => print('Wakelock:$value'));
     final ratio =
         MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
     final nativeVideo = Video(player: streamPlayer, showControls: false);
@@ -51,6 +54,8 @@ class _VlcPlayerState extends State<VlcPlayer> {
             onPressed: () {
               Navigator.pop(context);
               streamPlayer.stop();
+              Wakelock.disable();
+              Wakelock.enabled.then((value) => print('Wakelock:$value'));
             },
           ),
           title: Text(widget.title),
