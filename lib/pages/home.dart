@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:ice_live_viewer/pages/help.dart';
 import 'package:ice_live_viewer/pages/settings.dart';
 import 'package:ice_live_viewer/utils/linkparser.dart';
@@ -299,9 +300,9 @@ class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
                   ),
                 );
               }
-              return ListView.builder(
+              return MasonryGridView.count(
+                padding: const EdgeInsets.fromLTRB(0, 3, 0, 3),
                 shrinkWrap: true,
-                itemExtent: 65.0,
                 itemCount: count,
                 itemBuilder: (context, index) {
                   int indexNum = index + 1;
@@ -321,6 +322,7 @@ class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
                     );
                   }
                 },
+                crossAxisCount: 1,
               );
             } else {
               return const LinearProgressIndicator();
