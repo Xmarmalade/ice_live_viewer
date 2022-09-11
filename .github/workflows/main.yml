@@ -30,13 +30,6 @@ jobs:
         with:
           channel: 'stable'
           
-      - name: Run read-yaml action
-        id: yaml-data
-        uses: KJ002/read-yaml@main
-        with:
-          file: './pubspec.yaml'
-          key-path: '["version"]' 
-          
       - name: Build
         run: |
           flutter config --enable-windows-desktop
@@ -59,3 +52,52 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             build/windows/runner/Release/IceLiveViewer-${{github.ref_name}}-windows.zip
+
+      - name: Upload Release Asset
+        uses: actions/upload-artifact@v3
+        with:
+          path: build/windows/runner/Release/IceLiveViewer-${{github.ref_name}}-windows.zip
+
+
+  build-android:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Setup Java to compile Android project
+        uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          
+      - name: Build
+        run: |
+          flutter pub get
+          flutter build apk
+    
+      - name: Rename APK
+        run: |
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/IceLiveViewer-${{github.ref_name}}-android.apk
+          
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{github.ref_name}}
+          draft: true
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            build/app/outputs/flutter-apk/IceLiveViewer-${{github.ref_name}}-android.apk
+
+      - name: Upload Release Asset
+        uses: actions/upload-artifact@v3
+        with:
+          path: build/app/outputs/flutter-apk/IceLiveViewer-${{github.ref_name}}-android.apk
+
