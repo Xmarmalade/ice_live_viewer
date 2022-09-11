@@ -5,8 +5,8 @@ import 'package:ice_live_viewer/widgets/videoframe.dart';
 import 'package:ice_live_viewer/widgets/bilibilianmaku.dart';
 import 'package:ice_live_viewer/widgets/huyadanmaku.dart';
 
-class StreamPlayer extends StatefulWidget {
-  const StreamPlayer(
+class VlcPlayer extends StatefulWidget {
+  const VlcPlayer(
       {Key? key,
       required this.title,
       required this.url,
@@ -19,10 +19,10 @@ class StreamPlayer extends StatefulWidget {
   final int danmakuId;
   final String type;
   @override
-  State<StreamPlayer> createState() => _StreamPlayerState();
+  State<VlcPlayer> createState() => _VlcPlayerState();
 }
 
-class _StreamPlayerState extends State<StreamPlayer> {
+class _VlcPlayerState extends State<VlcPlayer> {
   final streamPlayer = Player(id: 11, registerTexture: true);
   @override
   void initState() {

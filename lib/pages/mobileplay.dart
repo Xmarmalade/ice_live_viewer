@@ -5,8 +5,8 @@ import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:ice_live_viewer/widgets/douyudanmaku.dart';
 
-class StreamPlayer extends StatefulWidget {
-  const StreamPlayer(
+class MobilePlayer extends StatefulWidget {
+  const MobilePlayer(
       {Key? key,
       required this.title,
       required this.url,
@@ -19,10 +19,10 @@ class StreamPlayer extends StatefulWidget {
   final int danmakuId;
   final String type;
   @override
-  State<StreamPlayer> createState() => _StreamPlayerState();
+  State<MobilePlayer> createState() => _MobilePlayerState();
 }
 
-class _StreamPlayerState extends State<StreamPlayer> {
+class _MobilePlayerState extends State<MobilePlayer> {
   late VideoPlayerController _controller;
   late ChewieController chewieController;
 
