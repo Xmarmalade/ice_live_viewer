@@ -12,14 +12,14 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
+  final bool enableNewHome = false;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'IceLiveViewer',
       theme: MyTheme().lightThemeData,
       darkTheme: MyTheme().darkThemeData,
-      home: kDebugMode ? const NewHome() : const Home(),
+      home: enableNewHome ? const NewHome() : const Home(),
     );
   }
 }
