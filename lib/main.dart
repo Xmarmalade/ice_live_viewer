@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       title: 'IceLiveViewer',
       theme: MyTheme().lightThemeData,
       darkTheme: MyTheme().darkThemeData,
-      home: /* kDebugMode ? NewHome() : */ Home(),
+      home: kDebugMode ? const NewHome() : const Home(),
     );
   }
 }
