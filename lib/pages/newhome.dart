@@ -10,83 +10,133 @@ class NewHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => RoomsNotifier(),
-      child: const HomePageScaffold(),
+      child: const HomePageRouter(),
     );
   }
 }
 
-class HomePageScaffold extends StatefulWidget {
-  const HomePageScaffold({
-    Key? key,
-  }) : super(key: key);
+class HomePageRouter extends StatefulWidget {
+  const HomePageRouter({Key? key}) : super(key: key);
 
   @override
-  State<HomePageScaffold> createState() => _HomePageScaffoldState();
+  State<HomePageRouter> createState() => _HomePageRouterState();
 }
 
-class _HomePageScaffoldState extends State<HomePageScaffold> {
+class _HomePageRouterState extends State<HomePageRouter> {
+  int _selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     final counter = Provider.of<RoomsNotifier>(context);
     TextEditingController controller = TextEditingController();
     double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("New Home Preview"), actions: [
-        IconButton(
-            onPressed: () {
-              counter.hideOfflineRooms();
-            },
-            tooltip: 'Hide Offline Rooms',
-            icon: const Icon(Icons.hide_source_rounded)),
-      ]),
-      floatingActionButton:
-          HomePageAddButton(controller: controller, counter: counter),
-      body: HomePageGridView(screenWidth: screenWidth, roomNotifier: counter),
+      bottomNavigationBar: NavigationBar(
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.star_rate_rounded),
+              label: 'Favorites',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.list_alt_rounded),
+              label: 'Recommend',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.settings_rounded),
+              label: 'Settings',
+            ),
+          ],
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          }),
+      body: [
+        Scaffold(
+          appBar: AppBar(title: const Text("Favorites"), actions: [
+            IconButton(
+                onPressed: () => counter.hideOfflineRooms(),
+                tooltip: 'Hide Offline Rooms',
+                icon: const Icon(Icons.remove_circle_outline_rounded))
+          ]),
+          body:
+              HomePageGridView(screenWidth: screenWidth, roomNotifier: counter),
+          floatingActionButton:
+              HomePageAddButton(controller: controller, counter: counter),
+        ),
+        Scaffold(
+            appBar: AppBar(title: const Text("Recommend")),
+            body: const Center(child: Text('recommend')) //RecommendPages(),
+            ),
+        Scaffold(
+            appBar: AppBar(title: const Text("Settings")),
+            body: const Center(child: Text('Settings')) //RecommendPages(),
+            ),
+      ][_selectedIndex],
     );
   }
 }
 
 class HomePageGridView extends StatelessWidget {
-  const HomePageGridView({
-    Key? key,
-    required this.screenWidth,
-    required this.roomNotifier,
-  }) : super(key: key);
+  const HomePageGridView(
+      {Key? key, required this.screenWidth, required this.roomNotifier})
+      : super(key: key);
 
   final double screenWidth;
   final RoomsNotifier roomNotifier;
 
   @override
   Widget build(BuildContext context) {
-    return MasonryGridView.count(
-      crossAxisCount: screenWidth > 1280
-          ? 4
-          : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
-      itemCount: roomNotifier.singleRoomsList.length,
-      itemBuilder: (context, index) {
-        if (roomNotifier.singleRoomsList.isNotEmpty) {
-          SingleRoom room = roomNotifier.singleRoomsList[index];
-          return RoomCard(room: room, counter: roomNotifier, index: index);
-        } else {
-          return Column(
-            mainAxisSize: MainAxisSize.max,
-            children: const [
-              Align(
-                alignment: AlignmentDirectional(0, 0),
-                child: Icon(
-                  Icons.post_add_outlined,
-                  size: 64,
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  'Hello World',
-                ),
-              ),
-            ],
-          );
-        }
-      },
+    if (roomNotifier.singleRoomsList.isNotEmpty) {
+      return MasonryGridView.count(
+          crossAxisCount: screenWidth > 1280
+              ? 4
+              : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
+          itemCount: roomNotifier.singleRoomsList.length,
+          itemBuilder: (context, index) {
+            SingleRoom room = roomNotifier.singleRoomsList[index];
+            return RoomCard(room: room, counter: roomNotifier, index: index);
+          });
+    } else {
+      return const HomeEmptyScreen();
+    }
+  }
+}
+
+class HomeEmptyScreen extends StatelessWidget {
+  const HomeEmptyScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Icon(
+              Icons.post_add_rounded,
+              size: 144,
+              color: Theme.of(context).disabledColor,
+            ),
+          ),
+          Expanded(
+            child: Text.rich(
+                TextSpan(children: [
+                  TextSpan(
+                      text: "No data! 没有数据\n\n",
+                      style: Theme.of(context).textTheme.headlineLarge),
+                  TextSpan(
+                      text: "Click the button below\nto add your first link",
+                      style: Theme.of(context).textTheme.headline3),
+                ]),
+                textAlign: TextAlign.center),
+          ),
+        ],
+      ),
     );
   }
 }
