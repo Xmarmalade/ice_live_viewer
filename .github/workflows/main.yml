@@ -85,14 +85,8 @@ jobs:
           KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
         run: |
           # import keystore from secrets
-          ls -all
           echo $KEYSTORE_BASE64 | base64 -di > android/app/key.jks
           echo $KEY_PROPERTIES | base64 -di > android/key.properties
-
-      - name: list files
-        run: |
-          ls -all
-          ls -all android
           
       - name: Build
         run: |
