@@ -47,7 +47,7 @@ class _MobilePlayerState extends State<MobilePlayer> {
   @override
   Widget build(BuildContext context) {
     Wakelock.enable();
-    Wakelock.enabled.then((value) => print('Wakelock:$value'));
+    //Wakelock.enabled.then((value) => print('Wakelock:$value'));
     final ratio =
         MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
 
@@ -76,7 +76,7 @@ class _MobilePlayerState extends State<MobilePlayer> {
       onWillPop: () async {
         _controller.pause();
         Wakelock.disable();
-        Wakelock.enabled.then((value) => print('Wakelock:$value'));
+        //Wakelock.enabled.then((value) => print('Wakelock:$value'));
         return true;
       },
       child: Scaffold(
@@ -86,7 +86,7 @@ class _MobilePlayerState extends State<MobilePlayer> {
             onPressed: () {
               Navigator.pop(context);
               Wakelock.disable();
-              Wakelock.enabled.then((value) => print('Wakelock:$value'));
+              //Wakelock.enabled.then((value) => print('Wakelock:$value'));
             },
           ),
           title: Text(widget.title),
