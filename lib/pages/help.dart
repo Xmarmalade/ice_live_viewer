@@ -21,13 +21,18 @@ class HelpPage extends StatelessWidget {
           SectionTitle(
             title: '如何使用',
           ),
-          TextTile(text: '你可以使用本应用程序追踪虎牙和哔哩哔哩的主播'),
+          TextTile(text: '你可以使用本应用程序追踪虎牙，斗鱼和哔哩哔哩的主播'),
           SectionTitle(title: '可解析的链接'),
+          TextTile(text: '''虎牙 https://*.huya.com/<房间号>\n
+                  虎牙的部分主播的房间号是字母，无需手动操作，字母会被自动转换\n
+                  Bilibili https://*.bilibili.com/<房间号>\n
+                  斗鱼 https://*.douyu.com/<房间号>  https://www.douyu.com/topic/<话题>?rid=<房间号>\n
+                  斗鱼的部分房间是虚假号码，也可以被转换
+                    '''),
+          SectionTitle(title: '部分链接无法播放'),
           TextTile(
               text:
-                  '虎牙 https://*.huya.com/<房间号>\nBilibili https://*.bilibili.com/<房间号>\n虎牙的部分主播的房间号是字母，无需手动操作，字母会被自动转换'),
-          SectionTitle(title: '部分链接无法播放'),
-          TextTile(text: '你可以尝试在其它播放器播放')
+                  '你可以尝试在其它播放器播放\n在Windows版本上使用的是VLC，在Android上使用的是系统播放组件，如果存在问题请提issue')
         ],
       ),
     );
