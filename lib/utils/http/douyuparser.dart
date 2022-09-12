@@ -79,13 +79,13 @@ class Douyu {
   Future<Map> _getRoomUrl() async {
     Map info = await _getRoomStreamInfo();
     //print(info);
-    Map<String, dynamic> realUrl = {'hw': {}, 'ws': {}};
+    Map<String, dynamic> realUrl = {'hw': {}, 'ws': {}, 'akm': {}};
     if (info['error'] == 0 || info['error'] == 104) {
       String key = info['key'];
       for (String cdn in realUrl.keys) {
-        realUrl[cdn]['原画'] = 'http://$cdn-tct.douyucdn.cn/live/$key.flv?uuid=';
+        realUrl[cdn]['原画'] = 'https://$cdn-tct.douyucdn.cn/live/$key.flv?uuid=';
         realUrl[cdn]['流畅'] =
-            'http://$cdn-tct.douyucdn.cn/live/${key}_900.flv?uuid=';
+            'https://$cdn-tct.douyucdn.cn/live/${key}_900.flv?uuid=';
       }
     }
     //print(realUrl);
