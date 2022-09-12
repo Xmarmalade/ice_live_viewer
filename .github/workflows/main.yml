@@ -73,6 +73,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '12.x'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
       
       - name: Create the Keystore file
         env:
@@ -84,10 +89,10 @@ jobs:
           echo $KEYSTORE_BASE64 | base64 -di > android/app/key.jks
           echo $KEY_PROPERTIES | base64 -di > android/key.properties
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
+      - name: list files
+        run: |
+          ls -all
+          ls -all android
           
       - name: Build
         run: |
@@ -114,4 +119,3 @@ jobs:
         with:
           name: artifact-android
           path: build/app/outputs/flutter-apk/IceLiveViewer-${{github.ref_name}}-android.apk
-
