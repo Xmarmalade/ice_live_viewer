@@ -68,10 +68,22 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+      
       - name: Setup Java to compile Android project
         uses: actions/setup-java@v1
         with:
           java-version: '12.x'
+      
+      - name: Create the Keystore file
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
+        run: |
+          # import keystore from secrets
+          ls -all
+          echo $KEYSTORE_BASE64 | base64 -di > android/app/key.jks
+          echo $KEY_PROPERTIES | base64 -di > android/key.properties
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
