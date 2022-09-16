@@ -1,59 +1,70 @@
 import 'package:flutter/material.dart';
 
 class MyTheme {
-  ThemeData lightThemeData = ThemeData(
-      primarySwatch: Colors.indigo,
+  Color primaryColor;
+
+  MyTheme(this.primaryColor);
+
+  get lightThemeData => ThemeData.from(
+      colorScheme: ColorScheme.fromSeed(
+          seedColor: primaryColor,
+          brightness: Brightness.light,
+          primary: primaryColor,
+          secondary: primaryColor),
       useMaterial3: true,
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         headline1: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
-          color: Colors.indigo,
+          color: primaryColor,
         ),
         headline2: TextStyle(
-          fontSize: 18,
+          fontSize: 20,
           fontWeight: FontWeight.bold,
-          color: Colors.indigo,
+          color: primaryColor,
+        ),
+        headline3: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: primaryColor,
         ),
         headlineLarge: TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.bold,
-          color: Colors.indigo,
-        ),
-        headline3: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w500,
-          color: Colors.blueGrey,
+          color: primaryColor,
         ),
       ));
 
-  ThemeData darkThemeData = ThemeData.from(
-      colorScheme: const ColorScheme.dark(
-        primary: Colors.indigo,
-        secondary: Colors.indigoAccent,
+  get darkThemeData => ThemeData.from(
+      colorScheme: ColorScheme.fromSeed(
+        error: const Color.fromARGB(255, 255, 99, 71),
+        seedColor: primaryColor,
         brightness: Brightness.dark,
+        primary: primaryColor,
+        secondary: primaryColor,
+        background: const Color.fromARGB(255, 24, 24, 24),
       ),
       useMaterial3: true,
-      textTheme: const TextTheme(
+      textTheme: TextTheme(
         headline1: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
-          color: Colors.indigo,
+          color: primaryColor,
         ),
         headline2: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.indigo,
-        ),
-        headline3: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
-          color: Colors.blueGrey,
+          color: primaryColor,
+        ),
+        headline3: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: primaryColor,
         ),
         headlineLarge: TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.w500,
-          color: Colors.indigo,
+          color: primaryColor,
         ),
       ));
 }
