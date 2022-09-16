@@ -245,7 +245,10 @@ class OfflineListTile extends StatelessWidget {
       leading: CircleAvatar(
         backgroundImage: NetworkImage(avatar),
       ),
-      title: Text(title == '' ? 'Disconnected' : 'Disconnected - $title'),
+      title: Text(
+        title == '' ? 'Disconnected' : 'Offline - $title',
+        style: TextStyle(color: Theme.of(context).disabledColor),
+      ),
       subtitle: Text(anchor),
       trailing: const Icon(Icons.chevron_right_sharp),
       onTap: () {
