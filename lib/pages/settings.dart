@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ice_live_viewer/provider/themeprovider.dart';
 import 'package:ice_live_viewer/utils/storage.dart';
+import 'package:provider/provider.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -25,10 +27,22 @@ class SettingsPage extends StatelessWidget {
             title: const Text('Settings'),
             subtitle: const Text('This page is still not complete'),
             leading: const Icon(
-              Icons.settings,
+              Icons.warning_amber_rounded,
               size: 32,
             ),
             onTap: () {},
+          ),
+          ListTile(
+            title: const Text('Change Theme'),
+            subtitle: const Text('Change the theme of the app'),
+            leading: const Icon(
+              Icons.color_lens,
+              size: 32,
+            ),
+            onTap: () {
+              Provider.of<AppThemeProvider>(context, listen: false)
+                  .showThemeDialog(context);
+            },
           ),
           const SwitchTile(
             title: 'Use custom resolution for Huya',
@@ -36,21 +50,21 @@ class SettingsPage extends StatelessWidget {
                 'Use custom resolution for Huya, if you want to use a custom resolution for Huya, you should enable this option',
             settingKey: 'use_custom_resolution_for_huya',
           ),
-          const SectionTitle(
-            title: 'Experimental',
-          ),
-          const SwitchTile(
-            title: '[Unrealized] Use Native Player',
-            subtitle:
-                'This setup only uses Win32 APIs & no texture, intermediate buffers or copying of pixel buffers.',
-            settingKey: 'use_native_player',
-          ),
           const SwitchTile(
             title: 'Use .m3u8 for Bilibili',
             subtitle:
                 'Use .m3u8 format to play Bilibili live stream instead of the default .flv format, when you find that Bilibili live stream cannot be played, you can try this option.',
             settingKey: 'use_m3u8',
-          )
+          ),
+          const SectionTitle(
+            title: 'Experimental',
+          ),
+          const SwitchTile(
+            title: '[Only Windows] Use Native Player',
+            subtitle:
+                'This setup only uses Win32 APIs & no texture, intermediate buffers or copying of pixel buffers.',
+            settingKey: 'use_native_player',
+          ),
         ],
       ),
     );
@@ -105,6 +119,7 @@ class _SwitchTileState extends State<SwitchTile> {
         title: Text(widget.title),
         subtitle: Text(widget.subtitle),
         value: _toggled!,
+        activeColor: Provider.of<AppThemeProvider>(context).themeColor,
         onChanged: (bool value) {
           switchPref(widget.settingKey);
           setState(() {
