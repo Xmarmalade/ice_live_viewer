@@ -67,7 +67,6 @@ Future<Map<String, dynamic>> getLiveInfo(String url) async {
   } else {
     int lUid = roomInfo['profileInfo']['uid'];
     String cover = roomInfo['liveData']['screenshot'];
-    //TODO fix cover 403
     Map streamDict = roomInfo['stream']['flv'];
     List multiLine = streamDict['multiLine'];
     List rateArray = streamDict['rateArray'];
