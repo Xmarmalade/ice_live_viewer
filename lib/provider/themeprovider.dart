@@ -4,13 +4,55 @@ import 'package:ice_live_viewer/utils/prefs_helper.dart';
 class AppThemeProvider extends ChangeNotifier {
   AppThemeProvider() {
     changeThemeColor(PrefsHelper.getThemeColorPrefIndex());
+    changeThemeMode(PrefsHelper.getThemeModePrefIndex());
   }
 
   static Map<String, ThemeMode> themeModes = {
-    "system": ThemeMode.system,
-    "on": ThemeMode.dark,
-    "off": ThemeMode.light,
+    "System": ThemeMode.system,
+    "Dark": ThemeMode.dark,
+    "Light": ThemeMode.light,
   };
+
+  late ThemeMode _themeMode;
+  late String _themeModeName;
+  get themeMode => _themeMode;
+  get themeModeName => _themeModeName;
+  void changeThemeMode(int index) {
+    _themeMode = AppThemeProvider.themeModes.values.toList()[index];
+    _themeModeName = AppThemeProvider.themeModes.keys.toList()[index];
+    notifyListeners();
+    PrefsHelper.setThemeModePrefIndex(index);
+  }
+
+  void showThemeModeSelectorDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Theme Mode'),
+          children: _createThemeModeSelectorWidget(context),
+        );
+      },
+    );
+  }
+
+  List<Widget> _createThemeModeSelectorWidget(BuildContext context) {
+    List<Widget> widgets = [];
+    for (var item in AppThemeProvider.themeModes.keys) {
+      widgets.add(RadioListTile(
+        activeColor: _themeColor,
+        groupValue: item,
+        value: _themeModeName,
+        title: Text(item),
+        onChanged: (value) {
+          changeThemeMode(
+              AppThemeProvider.themeModes.keys.toList().indexOf(item));
+          Navigator.of(context).pop();
+        },
+      ));
+    }
+    return widgets;
+  }
 
   static Map<String, Color> themeColors = {
     "Crimson": const Color.fromARGB(255, 220, 20, 60),
@@ -19,6 +61,7 @@ class AppThemeProvider extends ChangeNotifier {
     "Grass": Colors.lightGreen,
     "Teal": Colors.teal,
     "Sea Foam": const Color.fromARGB(255, 112, 193, 207),
+    "Ice": const Color.fromARGB(255, 115, 155, 208),
     "Blue": Colors.blue,
     "Indigo": Colors.indigo,
     "Violet": Colors.deepPurple,
@@ -36,10 +79,11 @@ class AppThemeProvider extends ChangeNotifier {
     PrefsHelper.setThemeColorPrefIndex(index);
   }
 
-  List<Widget> _createThemeSelectorWidget(BuildContext context) {
+  List<Widget> _createThemeColorSelectorWidget(BuildContext context) {
     List<Widget> themeSelectorWidgets = [];
     for (var item in AppThemeProvider.themeColors.keys) {
       themeSelectorWidgets.add(RadioListTile(
+        activeColor: _themeColor,
         groupValue: item,
         value: _themeColorName,
         title: Text(item,
@@ -47,6 +91,7 @@ class AppThemeProvider extends ChangeNotifier {
         onChanged: (value) {
           changeThemeColor(
               AppThemeProvider.themeColors.keys.toList().indexOf(item));
+          Navigator.of(context).pop();
           //Navigator.of(context).pop();
         },
       ));
@@ -54,17 +99,18 @@ class AppThemeProvider extends ChangeNotifier {
     return themeSelectorWidgets;
   }
 
-  void showThemeSelectorDialog(BuildContext context) {
+  void showThemeColorSelectorDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
           title: Text(
             'Change Theme',
-            style:
-                TextStyle(color: AppThemeProvider.themeColors[_themeColorName]),
+            style: TextStyle(
+                color: AppThemeProvider.themeColors[_themeColorName],
+                fontWeight: FontWeight.bold),
           ),
-          children: _createThemeSelectorWidget(context),
+          children: _createThemeColorSelectorWidget(context),
         );
       },
     );

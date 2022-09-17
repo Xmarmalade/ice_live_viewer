@@ -18,7 +18,7 @@ class SettingsPage extends StatelessWidget {
         ),
         title: const Text('Settings'),
       ),
-      body: Column(
+      body: ListView(
         children: <Widget>[
           const SectionTitle(
             title: 'General',
@@ -26,31 +26,31 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             title: const Text('Under Construction'),
             subtitle: const Text('This page is still not complete'),
-            leading: const Icon(
-              Icons.construction_rounded,
-              size: 32,
-            ),
+            leading: const Icon(Icons.construction_rounded, size: 32),
             onTap: () {},
           ),
           ListTile(
-            title: const Text('Change Theme'),
-            subtitle: const Text('Change the theme of the app'),
-            leading: const Icon(
-              Icons.color_lens,
-              size: 32,
-            ),
+            title: const Text('Change Theme Color'),
+            subtitle: const Text('Change the theme color of the app'),
+            leading: const Icon(Icons.color_lens, size: 32),
             onTap: () {
               Provider.of<AppThemeProvider>(context, listen: false)
-                  .showThemeSelectorDialog(context);
+                  .showThemeColorSelectorDialog(context);
             },
           ),
           ListTile(
-            title: const Text('Change Language'),
+            title: const Text('Change Theme Mode'),
+            subtitle: const Text('Change the theme mode of the app'),
+            leading: const Icon(Icons.dark_mode_rounded, size: 32),
+            onTap: () {
+              Provider.of<AppThemeProvider>(context, listen: false)
+                  .showThemeModeSelectorDialog(context);
+            },
+          ),
+          ListTile(
+            title: const Text('[Not complete]Change Language'),
             subtitle: const Text('Change the language of the app'),
-            leading: const Icon(
-              Icons.translate,
-              size: 32,
-            ),
+            leading: const Icon(Icons.translate_rounded, size: 32),
             onTap: () {},
           ),
           const SwitchTile(

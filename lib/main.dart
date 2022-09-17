@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'IceLiveViewer',
+      themeMode: Provider.of<AppThemeProvider>(context).themeMode,
       theme: MyTheme(Provider.of<AppThemeProvider>(context).themeColor)
           .lightThemeData,
       darkTheme: MyTheme(Provider.of<AppThemeProvider>(context).themeColor)
