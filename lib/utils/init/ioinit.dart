@@ -8,10 +8,12 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void init() async {
+  WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows) {
     DartVLC.initialize(useFlutterNativeView: false);
   }
   PrefsHelper.prefs = await SharedPreferences.getInstance();
+
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
       create: (_) => AppThemeProvider(),
