@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:ice_live_viewer/utils/prefs_helper.dart';
 
 class AppThemeProvider extends ChangeNotifier {
-  AppTheme() {
-    changeThemeColor(0);
+  AppThemeProvider() {
+    changeThemeColor(PrefsHelper.getThemeColorPrefIndex());
   }
-
-  int _themeModeIndex = 0;
-  int get themeModeIndex => _themeModeIndex;
-  int _themeColorIndex = 4;
-  int get themeColorIndex => _themeColorIndex;
-  String _themeColorName = '';
-
-  get themeColor => themeColors.values.toList()[_themeColorIndex];
 
   static Map<String, ThemeMode> themeModes = {
     "system": ThemeMode.system,
@@ -20,53 +13,58 @@ class AppThemeProvider extends ChangeNotifier {
   };
 
   static Map<String, Color> themeColors = {
-    "indigo": Colors.indigo,
-    "violet": Colors.deepPurple,
-    "grass": Colors.lightGreen,
-    "teal": Colors.teal,
-    "seafoam": const Color.fromARGB(255, 112, 193, 207),
+    "Crimson": const Color.fromARGB(255, 220, 20, 60),
+    "Orange": Colors.orange,
+    "Chrome": const Color.fromARGB(255, 230, 184, 0),
+    "Grass": Colors.lightGreen,
+    "Teal": Colors.teal,
+    "Sea Foam": const Color.fromARGB(255, 112, 193, 207),
+    "Blue": Colors.blue,
+    "Indigo": Colors.indigo,
+    "Violet": Colors.deepPurple,
+    "Orchid": const Color.fromARGB(255, 218, 112, 214),
   };
 
-  void setThemeModeIndex(int index) {
-    _themeModeIndex = index;
-    notifyListeners();
-  }
-
-  void setThemeColorIndex(int index) {
-    _themeColorIndex = index;
-    notifyListeners();
-  }
-
+  late Color _themeColor;
+  late String _themeColorName;
+  get themeColor => _themeColor;
+  get themeColorName => _themeColorName;
   void changeThemeColor(int index) {
+    _themeColor = AppThemeProvider.themeColors.values.toList()[index];
     _themeColorName = AppThemeProvider.themeColors.keys.toList()[index];
     notifyListeners();
+    PrefsHelper.setThemeColorPrefIndex(index);
   }
 
-  List<Widget> _createThemeWidget(BuildContext context) {
-    List<Widget> widgets = [];
+  List<Widget> _createThemeSelectorWidget(BuildContext context) {
+    List<Widget> themeSelectorWidgets = [];
     for (var item in AppThemeProvider.themeColors.keys) {
-      widgets.add(RadioListTile(
+      themeSelectorWidgets.add(RadioListTile(
         groupValue: item,
         value: _themeColorName,
         title: Text(item,
             style: TextStyle(color: AppThemeProvider.themeColors[item])),
         onChanged: (value) {
-          setThemeColorIndex(
+          changeThemeColor(
               AppThemeProvider.themeColors.keys.toList().indexOf(item));
-          Navigator.of(context).pop();
+          //Navigator.of(context).pop();
         },
       ));
     }
-    return widgets;
+    return themeSelectorWidgets;
   }
 
-  void showThemeDialog(BuildContext context) {
+  void showThemeSelectorDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
-          title: const Text('切换主题'),
-          children: _createThemeWidget(context),
+          title: Text(
+            'Change Theme',
+            style:
+                TextStyle(color: AppThemeProvider.themeColors[_themeColorName]),
+          ),
+          children: _createThemeSelectorWidget(context),
         );
       },
     );

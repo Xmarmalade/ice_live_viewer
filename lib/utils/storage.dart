@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'dart:convert';
+//TODO deprecated this util file and use the new one.
 
 //create a function to get all the data and store every value into a map
 Future<Map<String, dynamic>> getAllData() async {

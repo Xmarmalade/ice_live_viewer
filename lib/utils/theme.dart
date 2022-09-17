@@ -7,10 +7,12 @@ class MyTheme {
 
   get lightThemeData => ThemeData.from(
       colorScheme: ColorScheme.fromSeed(
-          seedColor: primaryColor,
-          brightness: Brightness.light,
-          primary: primaryColor,
-          secondary: primaryColor),
+        seedColor: primaryColor,
+        brightness: Brightness.light,
+        primary: primaryColor,
+        secondary: primaryColor,
+        background: Colors.grey[50],
+      ),
       useMaterial3: true,
       textTheme: TextTheme(
         headline1: TextStyle(

@@ -24,10 +24,10 @@ class SettingsPage extends StatelessWidget {
             title: 'General',
           ),
           ListTile(
-            title: const Text('Settings'),
+            title: const Text('Under Construction'),
             subtitle: const Text('This page is still not complete'),
             leading: const Icon(
-              Icons.warning_amber_rounded,
+              Icons.construction_rounded,
               size: 32,
             ),
             onTap: () {},
@@ -41,8 +41,17 @@ class SettingsPage extends StatelessWidget {
             ),
             onTap: () {
               Provider.of<AppThemeProvider>(context, listen: false)
-                  .showThemeDialog(context);
+                  .showThemeSelectorDialog(context);
             },
+          ),
+          ListTile(
+            title: const Text('Change Language'),
+            subtitle: const Text('Change the language of the app'),
+            leading: const Icon(
+              Icons.translate,
+              size: 32,
+            ),
+            onTap: () {},
           ),
           const SwitchTile(
             title: 'Use custom resolution for Huya',
@@ -60,7 +69,7 @@ class SettingsPage extends StatelessWidget {
             title: 'Experimental',
           ),
           const SwitchTile(
-            title: '[Only Windows] Use Native Player',
+            title: '[Only Windows|Not complete] Use Native Player',
             subtitle:
                 'This setup only uses Win32 APIs & no texture, intermediate buffers or copying of pixel buffers.',
             settingKey: 'use_native_player',
