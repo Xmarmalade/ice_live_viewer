@@ -94,8 +94,9 @@ class _MobilePlayerState extends State<MobilePlayer> {
         body: ratio > 1.2
             ? Row(
                 children: <Widget>[
-                  nativeVideo,
+                  Expanded(flex: 7, child: nativeVideo),
                   Expanded(
+                    flex: 3,
                     child: danmakuListView,
                   ),
                 ],
