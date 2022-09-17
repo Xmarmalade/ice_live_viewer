@@ -11,7 +11,7 @@ class PrefsHelper {
   }
 
   static void setThemeModePrefIndex(int value) {
-    prefs.setInt("themeMode", 0);
+    prefs.setInt("themeMode", value);
   }
 
   static int getThemeColorPrefIndex() {
