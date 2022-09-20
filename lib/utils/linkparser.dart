@@ -3,7 +3,7 @@ import 'package:ice_live_viewer/utils/http/huyaparser.dart';
 
 class LinkParser {
   /// Parses a link and returns its id.
-  String getRoomId(String url) {
+  static String getRoomId(String url) {
     String path = url.split("/").last;
     if (url.contains('topic')) {
       RegExpMatch? match = RegExp(r'[?&]rid=([^&#]+)').firstMatch(url);
@@ -20,7 +20,7 @@ class LinkParser {
   }
 
   /// Parses a link and standardizes it.
-  Future<String> formatUrl(String url) async {
+  static Future<String> formatUrl(String url) async {
     String roomId = getRoomId(url);
     if (url.contains("huya")) {
       if (int.tryParse(roomId) == null) {
@@ -39,7 +39,7 @@ class LinkParser {
   }
 
   /// Parses a link and checks its type.
-  String checkType(String url) {
+  static String checkType(String url) {
     if (url.contains("huya")) {
       return "huya";
     } else if (url.contains("bilibili")) {

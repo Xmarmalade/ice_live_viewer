@@ -64,8 +64,8 @@ class FloatingButton extends StatelessWidget {
                         context: context,
                         builder: (context) {
                           return FutureBuilder(
-                              future: LinkParser()
-                                  .formatUrl(linkTextController.text),
+                              future:
+                                  LinkParser.formatUrl(linkTextController.text),
                               builder: (context, snapshot) {
                                 if (snapshot.hasError) {
                                   return AlertDialog(
@@ -307,7 +307,7 @@ class _ListViewFutureBuilderState extends State<ListViewFutureBuilder> {
                 itemBuilder: (context, index) {
                   int indexNum = index + 1;
                   String url = (links)['$indexNum'].toString();
-                  String type = LinkParser().checkType(url);
+                  String type = LinkParser.checkType(url);
                   if (type == 'huya') {
                     return HuyaFutureListTileSkeleton(url: url);
                   } else if (type == 'bilibili') {
