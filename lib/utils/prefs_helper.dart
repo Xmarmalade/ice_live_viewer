@@ -7,11 +7,11 @@ class PrefsHelper {
   static late SharedPreferences prefs;
 
   static int getThemeModePrefIndex() {
-    return prefs.getInt("themeMode") ?? 0;
+    return prefs.getInt("theme_mode") ?? 0;
   }
 
   static void setThemeModePrefIndex(int value) {
-    prefs.setInt("themeMode", value);
+    prefs.setInt("theme_mode", value);
   }
 
   static int getThemeColorPrefIndex() {
@@ -20,5 +20,15 @@ class PrefsHelper {
 
   static void setThemeColorPrefIndex(int pref) async {
     prefs.setInt('theme_color', pref);
+  }
+
+  static List<String> getLinksOfRooms() {
+    List<String>? linksList = prefs.getStringList('links');
+    print(linksList);
+    return linksList ?? [];
+  }
+
+  static void setLinksOfRooms(List<String> links) {
+    prefs.setStringList('links', links);
   }
 }
