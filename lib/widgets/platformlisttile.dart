@@ -342,7 +342,7 @@ class BilibiliFutureListTileSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String roomId = LinkParser().getRoomId(url);
+    String roomId = LinkParser.getRoomId(url);
     return KeepAliveWrapper(
       keepAlive: true,
       child: FutureBuilder(

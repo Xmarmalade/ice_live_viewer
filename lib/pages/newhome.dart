@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:ice_live_viewer/pages/settings.dart';
 import 'package:ice_live_viewer/utils/keepalivewrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:ice_live_viewer/model/liveroom.dart';
+import 'package:ice_live_viewer/provider/roomprovider.dart';
 
 class NewHome extends StatelessWidget {
   const NewHome({Key? key}) : super(key: key);
   //homepage
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => RoomsNotifier(),
-      child: const HomePageRouter(),
-    );
+    return const HomePageRouter();
   }
 }
 
@@ -28,7 +27,7 @@ class _HomePageRouterState extends State<HomePageRouter> {
 
   @override
   Widget build(BuildContext context) {
-    final counter = Provider.of<RoomsNotifier>(context);
+    final provider = Provider.of<RoomsProvider>(context);
     TextEditingController controller = TextEditingController();
     double screenWidth = MediaQuery.of(context).size.width;
 
@@ -57,24 +56,26 @@ class _HomePageRouterState extends State<HomePageRouter> {
       body: [
         Scaffold(
           appBar: AppBar(title: const Text("Favorites"), actions: [
-            IconButton(
-                onPressed: () => counter.hideOfflineRooms(),
-                tooltip: 'Hide Offline Rooms',
-                icon: const Icon(Icons.remove_circle_outline_rounded))
+            provider.isHideOffline == false
+                ? IconButton(
+                    onPressed: () => provider.hideOfflineRooms(),
+                    tooltip: 'Hide Offline Rooms',
+                    icon: const Icon(Icons.remove_circle_outline_rounded))
+                : IconButton(
+                    onPressed: () => provider.showOfflineRooms(),
+                    tooltip: 'Show Offline Rooms',
+                    icon: const Icon(Icons.add_circle_outline_rounded)),
           ]),
-          body:
-              HomePageGridView(screenWidth: screenWidth, roomNotifier: counter),
-          floatingActionButton:
-              HomePageAddButton(controller: controller, counter: counter),
+          body: HomePageGridView(
+              screenWidth: screenWidth, roomsProvider: provider),
+          floatingActionButton: HomePageAddButton(
+              controller: controller, roomsProvider: provider),
         ),
         Scaffold(
             appBar: AppBar(title: const Text("Recommend")),
             body: const Center(child: Text('recommend')) //RecommendPages(),
             ),
-        Scaffold(
-            appBar: AppBar(title: const Text("Settings")),
-            body: const Center(child: Text('Settings')) //RecommendPages(),
-            ),
+        const SettingsPage(), //RecommendPages(),
       ][_selectedIndex],
     );
   }
@@ -82,25 +83,28 @@ class _HomePageRouterState extends State<HomePageRouter> {
 
 class HomePageGridView extends StatelessWidget {
   const HomePageGridView(
-      {Key? key, required this.screenWidth, required this.roomNotifier})
+      {Key? key, required this.screenWidth, required this.roomsProvider})
       : super(key: key);
 
   final double screenWidth;
-  final RoomsNotifier roomNotifier;
+  final RoomsProvider roomsProvider;
 
   @override
   Widget build(BuildContext context) {
-    if (roomNotifier.singleRoomsList.isNotEmpty) {
+    if (roomsProvider.roomsList.isNotEmpty) {
       return KeepAliveWrapper(
         child: MasonryGridView.count(
+            padding: const EdgeInsets.all(5),
+            controller: ScrollController(),
             crossAxisCount: screenWidth > 1280
                 ? 4
                 : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
-            itemCount: roomNotifier.singleRoomsList.length,
+            itemCount: roomsProvider.roomsList.length,
             physics: (const BouncingScrollPhysics()),
             itemBuilder: (context, index) {
-              SingleRoom room = roomNotifier.singleRoomsList[index];
-              return RoomCard(room: room, counter: roomNotifier, index: index);
+              SingleRoom room = roomsProvider.roomsList[index];
+              return RoomCard(
+                  room: room, roomsProvider: roomsProvider, index: index);
             }),
       );
     } else {
@@ -149,12 +153,12 @@ class RoomCard extends StatelessWidget {
   const RoomCard({
     Key? key,
     required this.room,
-    required this.counter,
+    required this.roomsProvider,
     required this.index,
   }) : super(key: key);
 
   final SingleRoom room;
-  final RoomsNotifier counter;
+  final RoomsProvider roomsProvider;
   final int index;
 
   @override
@@ -171,14 +175,21 @@ class RoomCard extends StatelessWidget {
             context: context,
             builder: (context) => AlertDialog(
                   title: Text(room.title),
-                  content: Text(room.roomId),
+                  content: Text(room.roomId + '\n' + room.liveStatus),
                   actions: [
                     TextButton(
                       onPressed: () {
-                        counter.removeSingleRooms(index);
+                        roomsProvider.removeRoom(room.link);
                         return Navigator.pop(context);
                       },
                       child: const Text("Remove"),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        roomsProvider.moveToTop(room.link);
+                        return Navigator.pop(context);
+                      },
+                      child: const Text("Move to top"),
                     ),
                   ],
                 )),
@@ -214,21 +225,24 @@ class RoomCard extends StatelessWidget {
                             TextSpan(text: stackTrace.toString())
                           ]))),
                         )
-                      : const Center(
-                          child: Text(
-                            "Offline",
-                            style: TextStyle(fontSize: 32),
+                      : Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.tv_off_rounded, size: 48),
+                              Text("Offline", style: TextStyle(fontSize: 28))
+                            ],
                           ),
                         )),
             ),
             ListTile(
               leading: CircleAvatar(
-                foregroundImage: NetworkImage(room.avatar),
+                //foregroundImage: NetworkImage(room.avatar),
                 radius: 20,
-                backgroundColor: Theme.of(context).errorColor,
+                backgroundColor: Theme.of(context).disabledColor,
               ),
               title: Text(
-                room.title,
+                room.link,
                 maxLines: 1,
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
@@ -254,11 +268,11 @@ class HomePageAddButton extends StatelessWidget {
   const HomePageAddButton({
     Key? key,
     required this.controller,
-    required this.counter,
+    required this.roomsProvider,
   }) : super(key: key);
 
   final TextEditingController controller;
-  final RoomsNotifier counter;
+  final RoomsProvider roomsProvider;
 
   @override
   Widget build(BuildContext context) {
@@ -268,18 +282,15 @@ class HomePageAddButton extends StatelessWidget {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: const Text("Add"),
-              content: TextField(
-                controller: controller,
-              ),
+              title: const Text("Add your link"),
+              content: TextField(controller: controller),
               actions: [
                 TextButton(
-                  onPressed: () {
-                    counter.addSingleRoom(controller.text);
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Add"),
-                ),
+                    onPressed: () {
+                      roomsProvider.addRoom(controller.text);
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Add")),
               ],
             );
           },
@@ -290,7 +301,7 @@ class HomePageAddButton extends StatelessWidget {
   }
 }
 
-class RoomsNotifier with ChangeNotifier {
+/* class RoomsNotifier with ChangeNotifier {
   List<SingleRoom> singleRoomsList = [
     SingleRoom.fromJson({
       "avatar":
@@ -382,7 +393,6 @@ class RoomsNotifier with ChangeNotifier {
     notifyListeners();
   }
 
-/*   Future<void> getRoomsFromLocalStorage() {
 
-  } */
 }
+ */
