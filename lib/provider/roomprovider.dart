@@ -4,11 +4,11 @@ import 'package:ice_live_viewer/utils/prefs_helper.dart';
 
 class RoomsProvider with ChangeNotifier {
   RoomsProvider() {
-    _getRoomsFromPrefs(PrefsHelper.getLinksOfRooms());
+    _getRoomsFromPrefs(PrefsHelper.getLinksOfRoomsPrefList());
   }
 
-  final List<SingleRoom> _roomsList = [];
-  final List<SingleRoom> _offlineRoomsList = [];
+  List<SingleRoom> _roomsList = [];
+  List<SingleRoom> _offlineRoomsList = [];
   bool _isHideOffline = false;
   get roomsList => _roomsList;
   get isHideOffline => _isHideOffline;
@@ -26,7 +26,7 @@ class RoomsProvider with ChangeNotifier {
     for (var item in _roomsList) {
       links.add(item.link);
     }
-    PrefsHelper.setLinksOfRooms(links);
+    PrefsHelper.setLinksOfRoomsPrefList(links);
   }
 
   void addRoom(String link) {
@@ -35,15 +35,15 @@ class RoomsProvider with ChangeNotifier {
     _saveRoomsToPrefs();
   }
 
-  void removeRoom(String link) {
-    _roomsList.remove(SingleRoom.fromLink(link));
+  void removeRoom(int index) {
+    _roomsList.removeAt(index);
     notifyListeners();
     _saveRoomsToPrefs();
   }
 
-  void moveToTop(String link) {
-    _roomsList.remove(SingleRoom.fromLink(link));
-    _roomsList.insert(0, SingleRoom.fromLink(link));
+  void moveToTop(int index) {
+    _roomsList.insert(0, _roomsList[index]);
+    _roomsList.removeAt(index + 1);
     notifyListeners();
     _saveRoomsToPrefs();
   }

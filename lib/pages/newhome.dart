@@ -27,10 +27,9 @@ class _HomePageRouterState extends State<HomePageRouter> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<RoomsProvider>(context);
-    TextEditingController controller = TextEditingController();
+    RoomsProvider provider = Provider.of<RoomsProvider>(context);
+    TextEditingController addLinkController = TextEditingController();
     double screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       bottomNavigationBar: NavigationBar(
           destinations: const [
@@ -39,8 +38,8 @@ class _HomePageRouterState extends State<HomePageRouter> {
               label: 'Favorites',
             ),
             NavigationDestination(
-              icon: Icon(Icons.list_alt_rounded),
-              label: 'Recommend',
+              icon: Icon(Icons.trending_up_rounded),
+              label: 'Popular',
             ),
             NavigationDestination(
               icon: Icon(Icons.settings_rounded),
@@ -54,6 +53,7 @@ class _HomePageRouterState extends State<HomePageRouter> {
             });
           }),
       body: [
+        //Favorites
         Scaffold(
           appBar: AppBar(title: const Text("Favorites"), actions: [
             provider.isHideOffline == false
@@ -69,12 +69,15 @@ class _HomePageRouterState extends State<HomePageRouter> {
           body: HomePageGridView(
               screenWidth: screenWidth, roomsProvider: provider),
           floatingActionButton: HomePageAddButton(
-              controller: controller, roomsProvider: provider),
+              controller: addLinkController, roomsProvider: provider),
         ),
+        //Popular
         Scaffold(
             appBar: AppBar(title: const Text("Recommend")),
-            body: const Center(child: Text('recommend')) //RecommendPages(),
+            body:
+                const Center(child: Text('Recommend Page')) //RecommendPages(),
             ),
+        //Settings
         const SettingsPage(), //RecommendPages(),
       ][_selectedIndex],
     );
@@ -179,14 +182,14 @@ class RoomCard extends StatelessWidget {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        roomsProvider.removeRoom(room.link);
+                        roomsProvider.removeRoom(index);
                         return Navigator.pop(context);
                       },
                       child: const Text("Remove"),
                     ),
                     TextButton(
                       onPressed: () {
-                        roomsProvider.moveToTop(room.link);
+                        roomsProvider.moveToTop(index);
                         return Navigator.pop(context);
                       },
                       child: const Text("Move to top"),

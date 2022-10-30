@@ -9,15 +9,11 @@ class SingleRoom {
   String liveStatus = 'OFF';
   String cover = '';
   String platform = '';
+  int huyaDanmakuId = 0;
+  Map cdnMultiLink = {};
 
   SingleRoom(this.roomId,
-      {this.title = '',
-      this.link = '',
-      this.nick = '',
-      this.avatar = '',
-      this.liveStatus = 'OFF',
-      this.cover = '',
-      this.platform = 'UNKNOWN'});
+      {this.link = '', this.liveStatus = 'OFF', this.platform = 'UNKNOWN'});
 
   SingleRoom.fromJson(Map<String, dynamic> json)
       : roomId = json['roomId'],
