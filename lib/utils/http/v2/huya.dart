@@ -36,13 +36,13 @@ class HuyaApi {
     newEmptyRoom.avatar = roomInfo['profileInfo']['avatar180'];
     newEmptyRoom.title = roomInfo['liveData']['introduction'];
     if (liveStatus == 'OFF') {
-      newEmptyRoom.liveStatus = '0';
+      newEmptyRoom.liveStatus = LiveStatus.offline;
       return newEmptyRoom;
     } else if (liveStatus == 'REPLAY') {
-      newEmptyRoom.liveStatus = '2';
+      newEmptyRoom.liveStatus = LiveStatus.replay;
       return newEmptyRoom;
     } else {
-      newEmptyRoom.liveStatus = '1';
+      newEmptyRoom.liveStatus = LiveStatus.live;
       bool useCustomResolution = PrefsHelper.getUseCustomResolutionPref();
       newEmptyRoom.huyaDanmakuId = roomInfo['profileInfo']['uid'];
       newEmptyRoom.cover = roomInfo['liveData']['screenshot'];

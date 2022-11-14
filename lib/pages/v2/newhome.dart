@@ -1,6 +1,8 @@
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:ice_live_viewer/pages/settings.dart';
+import 'package:ice_live_viewer/utils/http/v2/httpapi.dart';
 import 'package:ice_live_viewer/utils/keepalivewrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:ice_live_viewer/model/liveroom.dart';
@@ -30,6 +32,7 @@ class _HomePageRouterState extends State<HomePageRouter> {
     RoomsProvider provider = Provider.of<RoomsProvider>(context);
     TextEditingController addLinkController = TextEditingController();
     double screenWidth = MediaQuery.of(context).size.width;
+    //provider.getRoomsInfo();
     return Scaffold(
       bottomNavigationBar: NavigationBar(
           destinations: const [
@@ -96,19 +99,25 @@ class HomePageGridView extends StatelessWidget {
   Widget build(BuildContext context) {
     if (roomsProvider.roomsList.isNotEmpty) {
       return KeepAliveWrapper(
-        child: MasonryGridView.count(
-            padding: const EdgeInsets.all(5),
-            controller: ScrollController(),
-            crossAxisCount: screenWidth > 1280
-                ? 4
-                : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
-            itemCount: roomsProvider.roomsList.length,
-            physics: (const BouncingScrollPhysics()),
-            itemBuilder: (context, index) {
-              SingleRoom room = roomsProvider.roomsList[index];
-              return RoomCard(
-                  room: room, roomsProvider: roomsProvider, index: index);
-            }),
+        child: EasyRefresh(
+          onLoad: () async {
+            return IndicatorResult.success;
+          },
+          onRefresh: () => roomsProvider.getRoomsInfoFromApi(),
+          child: MasonryGridView.count(
+              padding: const EdgeInsets.all(5),
+              controller: ScrollController(),
+              crossAxisCount: screenWidth > 1280
+                  ? 4
+                  : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
+              itemCount: roomsProvider.roomsList.length,
+              physics: (const BouncingScrollPhysics()),
+              itemBuilder: (context, index) {
+                SingleRoom room = roomsProvider.roomsList[index];
+                return RoomCard(
+                    room: room, roomsProvider: roomsProvider, index: index);
+              }),
+        ),
       );
     } else {
       return const HomeEmptyScreen();
@@ -166,7 +175,8 @@ class RoomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return KeepAliveWrapper(
+        child: Card(
       elevation: 5,
       margin: const EdgeInsets.fromLTRB(7.5, 7.5, 7.5, 7.5),
       shape: RoundedRectangleBorder(
@@ -178,7 +188,14 @@ class RoomCard extends StatelessWidget {
             context: context,
             builder: (context) => AlertDialog(
                   title: Text(room.title),
-                  content: Text(room.roomId + '\n' + room.liveStatus),
+                  content: Text('RoomId' +
+                      room.roomId +
+                      '\nLiveStatus: ' +
+                      room.liveStatus.name +
+                      '\ncover' +
+                      room.cover +
+                      '\n' +
+                      room.cdnMultiLink.toString()),
                   actions: [
                     TextButton(
                       onPressed: () {
@@ -209,7 +226,7 @@ class RoomCard extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   color: Theme.of(context).focusColor,
                   elevation: 0,
-                  child: room.liveStatus == 'ON'
+                  child: room.liveStatus.name == 'live'
                       ? Image.network(
                           room.cover,
                           fit: BoxFit.fill,
@@ -240,12 +257,13 @@ class RoomCard extends StatelessWidget {
             ),
             ListTile(
               leading: CircleAvatar(
-                //foregroundImage: NetworkImage(room.avatar),
+                foregroundImage:
+                    (room.avatar == '') ? null : NetworkImage(room.avatar),
                 radius: 20,
                 backgroundColor: Theme.of(context).disabledColor,
               ),
               title: Text(
-                room.link,
+                room.title,
                 maxLines: 1,
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
@@ -263,7 +281,7 @@ class RoomCard extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 

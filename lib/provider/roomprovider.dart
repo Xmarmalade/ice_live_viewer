@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:ice_live_viewer/model/liveroom.dart';
+import 'package:ice_live_viewer/utils/http/v2/httpapi.dart';
 import 'package:ice_live_viewer/utils/prefs_helper.dart';
 
 class RoomsProvider with ChangeNotifier {
   RoomsProvider() {
     _getRoomsFromPrefs(PrefsHelper.getLinksOfRoomsPrefList());
+    getRoomsInfoFromApi();
   }
 
-  List<SingleRoom> _roomsList = [];
-  List<SingleRoom> _offlineRoomsList = [];
+  final List<SingleRoom> _roomsList = [];
+  final List<SingleRoom> _tempRoomsList = [];
   bool _isHideOffline = false;
   get roomsList => _roomsList;
   get isHideOffline => _isHideOffline;
@@ -19,6 +21,15 @@ class RoomsProvider with ChangeNotifier {
       _roomsList.add(singleRoom);
     }
     notifyListeners();
+  }
+
+  void getRoomsInfoFromApi() async {
+    for (var item in _roomsList) {
+      SingleRoom singleRoom = await HttpApi.getLiveInfo(item);
+      _roomsList[_roomsList.indexOf(item)] = singleRoom;
+      notifyListeners();
+      print(singleRoom);
+    }
   }
 
   void _saveRoomsToPrefs() {
@@ -48,25 +59,35 @@ class RoomsProvider with ChangeNotifier {
     _saveRoomsToPrefs();
   }
 
-  void hideOfflineRooms() {
-    for (var item in _roomsList) {
-      if (item.liveStatus == 'OFF') {
-        _offlineRoomsList.add(item);
-      }
+  void changeRoomInfo(int index, SingleRoom singleRoom) {
+    if (index != -1) {
+      _roomsList[index] = singleRoom;
+      //notifyListeners();
     }
-    for (var item in _offlineRoomsList) {
-      _roomsList.remove(item);
+  }
+
+  void hideOfflineRooms() {
+    for (var element in _roomsList) {
+      _tempRoomsList.add(element);
+    }
+    for (var item in _tempRoomsList) {
+      if (item.liveStatus.name != 'live') {
+        print(
+            'offline: ${item.roomId}, platform: ${item.platform}, liveStatus: ${item.liveStatus}');
+        _roomsList.removeWhere((element) => element.roomId == item.roomId);
+      }
     }
     notifyListeners();
     _isHideOffline = true;
   }
 
   void showOfflineRooms() {
-    for (var item in _offlineRoomsList) {
+    _roomsList.clear();
+    for (var item in _tempRoomsList) {
       _roomsList.add(item);
-      notifyListeners();
     }
-    _offlineRoomsList.clear();
+    _tempRoomsList.clear();
     _isHideOffline = false;
+    notifyListeners();
   }
 }

@@ -1,19 +1,26 @@
 import 'package:ice_live_viewer/utils/linkparser.dart';
 
+enum LiveStatus { live, offline, replay, unknown }
+
+enum Platform { huya, bilibili, douyu, unknown }
+
 class SingleRoom {
   String roomId;
   String link;
+  bool isInit = true;
   String title = '';
   String nick = '';
   String avatar = '';
-  String liveStatus = 'OFF';
+  LiveStatus liveStatus = LiveStatus.unknown;
   String cover = '';
   String platform = '';
   int huyaDanmakuId = 0;
   Map cdnMultiLink = {};
 
   SingleRoom(this.roomId,
-      {this.link = '', this.liveStatus = 'OFF', this.platform = 'UNKNOWN'});
+      {this.link = '',
+      this.liveStatus = LiveStatus.unknown,
+      this.platform = 'UNKNOWN'});
 
   SingleRoom.fromJson(Map<String, dynamic> json)
       : roomId = json['roomId'],
@@ -36,4 +43,8 @@ class SingleRoom {
       : link = rawLink,
         platform = LinkParser.checkType(rawLink),
         roomId = LinkParser.getRoomId(rawLink);
+
+  @override
+  String toString() =>
+      'roomId: $roomId, link: $link, title: $title, nick: $nick, liveStatus: $liveStatus, platform: $platform,';
 }
