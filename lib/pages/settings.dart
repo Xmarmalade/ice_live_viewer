@@ -60,7 +60,7 @@ class SettingsPage extends StatelessWidget {
             settingKey: 'use_custom_resolution_for_huya',
           ),
           const SwitchTile(
-            title: 'Use .m3u8 for Bilibili',
+            title: '[Deprecated]Use .m3u8 for Bilibili',
             subtitle:
                 'Use .m3u8 format to play Bilibili live stream instead of the default .flv format, when you find that Bilibili live stream cannot be played, you can try this option.',
             settingKey: 'use_m3u8',

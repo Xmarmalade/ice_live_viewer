@@ -20,9 +20,11 @@ void init() async {
       create: (_) => AppThemeProvider(),
       lazy: false,
     ),
-    ChangeNotifierProvider(
-      create: (_) => RoomsProvider(),
-      lazy: false,
-    ),
+    //TODO: ChangeNotifierProvider temporary disabled
+
+    // ChangeNotifierProvider(
+    //   create: (_) => RoomsProvider(),
+    //   lazy: false,
+    // ),
   ], child: const MyApp()));
 }

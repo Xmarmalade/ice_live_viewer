@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class About extends StatelessWidget {
   const About({
-    this.version = '0.3.5',
+    this.version = '0.3.6',
     Key? key,
   }) : super(key: key);
 
