@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:ice_live_viewer/utils/storage.dart';
 
 /// 获取网页json数据 由于bilibili的编码utf-8 所以需要转换
 Future<dynamic> _getJson(String url) async {
@@ -59,39 +58,120 @@ Future<Map<String, String>> getLiveInfo(String roomId) async {
 ///
 /// 返回画质-链接列表{'4': [主线，备线，备线，备线],'3': [主线，备线，备线，备线]}
 Future<Map<String, List>> getStreamLink(String roomId) async {
-  bool useM3u8 = await getSwitchPref('use_m3u8');
-  String platform = useM3u8 ? 'h5' : 'web';
-  String defaultStreamUrl =
-      'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=$roomId&platform=$platform&otype=json&quality=4';
-  dynamic streamJson = await _getJson(defaultStreamUrl);
-  List<dynamic> acceptQuality = streamJson['data']['accept_quality'];
-  Map<String, List> streamMap = {};
-  List<dynamic> streamList = streamJson['data']['durl'];
-  List<String> streamListUrl = [];
-  for (Map stream in streamList) {
-    if (stream['url'] != null) {
-      streamListUrl.add(stream['url']);
-    }
+  //bool useM3u8 = await getSwitchPref('use_m3u8');
+  //String defaultStreamUrl =
+  //'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=$roomId&platform=$platform&otype=json&quality=4';
+  String defaultQn = '10000';
+  String newStreamUrl =
+      'https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id=$roomId&qn=$defaultQn&platform=h5&ptype=8&codec=0,1&format=0,1,2&protocol=0,1';
+  dynamic streamJson = await _getJson(newStreamUrl);
+  List<dynamic> qualityReferenceList =
+      streamJson['data']['playurl_info']['playurl']['g_qn_desc'];
+  //print(qualityReferenceList);
+
+  Map<int, String> qualityRefMap = {};
+  for (var i = 0; i < qualityReferenceList.length; i++) {
+    qualityRefMap[qualityReferenceList[i]['qn']] =
+        qualityReferenceList[i]['desc'];
   }
-  streamMap['4'] = streamListUrl;
-  if (acceptQuality.length != 1) {
-    for (String qualityOption in acceptQuality) {
-      if (qualityOption != '4') {
-        String candidateStreamUrl =
-            'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=$roomId&platform=$platform&otype=json&quality=$qualityOption';
-        dynamic otherStreamJson = await _getJson(candidateStreamUrl);
-        List<dynamic> otherStreamList = otherStreamJson['data']['durl'];
-        List<String> otherStreamListUrl = [];
-        for (Map stream in otherStreamList) {
-          if (stream['url'] != null) {
-            otherStreamListUrl.add(stream['url']);
-          }
+  List<dynamic> streamMultiList =
+      streamJson['data']['playurl_info']['playurl']['stream'];
+  //print('streamMultiList: $streamMultiList');
+  Map streamProtocol = streamMultiList[0]['format'][0];
+  Map<String, List> finalStream = {};
+  //Find the m3u8-fmp4 link
+  for (int i = 0; i < streamMultiList.length; i++) {
+    if (streamMultiList[i]['protocol_name'] == 'http_hls') {
+      for (int j = 0; j < streamMultiList[i]['format'][j].length; j++) {
+        if (streamMultiList[i]['format'][j]['format_name'] == 'fmp4') {
+          streamProtocol = streamMultiList[i]['format'][j];
+          break;
         }
-        streamMap[qualityOption] = otherStreamListUrl;
       }
     }
   }
-  return streamMap;
+  List<dynamic> acceptQn = streamProtocol['codec'][0]['accept_qn'];
+  for (int i = 0; i < acceptQn.length; i++) {
+    int qn = acceptQn[i].toInt();
+    String qnName = qualityRefMap[qn] ?? qn.toString();
+    if (qn == 10000) {
+      List urlInfo = streamProtocol['codec'][0]['url_info'];
+      String baseUrl = streamProtocol['codec'][0]['base_url'];
+      List urlMap = [];
+      for (int i = 0; i < urlInfo.length; i++) {
+        String finalUrl = urlInfo[i]['host'] + baseUrl + urlInfo[i]['extra'];
+        urlMap.add(finalUrl);
+      }
+      finalStream[qnName] = urlMap;
+      continue;
+    }
+
+    String qnUrl =
+        'https://api.live.bilibili.com/xlive/web-room/v2/index/getRoomPlayInfo?room_id=$roomId&qn=$qn&platform=h5&ptype=8&codec=0,1&format=0,1,2&protocol=0,1';
+    dynamic qnJson = await _getJson(qnUrl);
+    List<dynamic> qnStreamMultiList =
+        qnJson['data']['playurl_info']['playurl']['stream'];
+
+    Map qnStreamProtocol = qnStreamMultiList[0]['format'][0];
+    for (int i = 0; i < qnStreamMultiList.length; i++) {
+      if (qnStreamMultiList[i]['protocol_name'] == 'http_hls') {
+        for (int j = 0; j < qnStreamMultiList[i]['format'][j].length; j++) {
+          if (qnStreamMultiList[i]['format'][j]['format_name'] == 'fmp4') {
+            qnStreamProtocol = qnStreamMultiList[i]['format'][j];
+            break;
+          }
+        }
+      }
+    }
+    List urlInfo = qnStreamProtocol['codec'][0]['url_info'];
+    String baseUrl = qnStreamProtocol['codec'][0]['base_url'];
+    List urlMap = [];
+    for (int i = 0; i < urlInfo.length; i++) {
+      String finalUrl = urlInfo[i]['host'] + baseUrl + urlInfo[i]['extra'];
+      urlMap.add(finalUrl);
+    }
+    finalStream[qnName] = urlMap;
+
+    // List urlInfo = streamProtocol['codec'][0]['url_info'];
+    //   String baseUrl = streamProtocol['codec'][0]['base_url'];
+    //   Map urlMap = {};
+    //   for (int i = 0; i < urlInfo.length; i++) {
+    //     String finalUrl = urlInfo[i]['host'] + baseUrl + urlInfo[i]['extra'];
+    //     urlMap['Line$i'] = finalUrl;
+    //   }
+    //   finalStream[qnName] = urlMap;
+  }
+  //print(finalStream.toString());
+  return finalStream;
+
+  // List<dynamic> acceptQuality = streamJson['data']['accept_quality'];
+  // Map<String, List> streamMap = {};
+  // List<dynamic> streamList = streamJson['data']['durl'];
+  // List<String> streamListUrl = [];
+  // for (Map stream in streamList) {
+  //   if (stream['url'] != null) {
+  //     streamListUrl.add(stream['url']);
+  //   }
+  // }
+  // streamMap['4'] = streamListUrl;
+  // if (acceptQuality.length != 1) {
+  //   for (String qualityOption in acceptQuality) {
+  //     if (qualityOption != '4') {
+  //       String candidateStreamUrl =
+  //           'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=$roomId&platform=$platform&otype=json&quality=$qualityOption';
+  //       dynamic otherStreamJson = await _getJson(candidateStreamUrl);
+  //       List<dynamic> otherStreamList = otherStreamJson['data']['durl'];
+  //       List<String> otherStreamListUrl = [];
+  //       for (Map stream in otherStreamList) {
+  //         if (stream['url'] != null) {
+  //           otherStreamListUrl.add(stream['url']);
+  //         }
+  //       }
+  //       streamMap[qualityOption] = otherStreamListUrl;
+  //     }
+  //   }
+  // }
+  // return streamMap;
 }
 
 ///接收房间号 返回map

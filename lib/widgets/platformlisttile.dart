@@ -422,9 +422,7 @@ class BilibiliOnlineListTile extends StatelessWidget {
             builder: (context) {
               List<Widget> resolutionListTiles = [];
               for (String resolution in streamLink.keys) {
-                String resolutionHint = resolution == '4'
-                    ? '原画'
-                    : (resolution == '3' ? '超清' : '高清');
+                String resolutionHint = resolution;
                 List linkList = streamLink[resolution]!;
                 List<PopupMenuEntry<String>> givenCdn = [];
                 for (String cdnLink in linkList) {

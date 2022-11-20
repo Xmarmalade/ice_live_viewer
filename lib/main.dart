@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ice_live_viewer/pages/home.dart';
-import 'package:ice_live_viewer/pages/newhome.dart';
+import 'package:ice_live_viewer/pages/v2/newhome.dart';
 import 'package:ice_live_viewer/utils/theme.dart';
 import 'package:ice_live_viewer/provider/themeprovider.dart';
 import 'package:ice_live_viewer/utils/init/ioinit.dart'
