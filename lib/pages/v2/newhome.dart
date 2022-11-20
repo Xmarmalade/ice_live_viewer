@@ -1,8 +1,6 @@
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:ice_live_viewer/pages/settings.dart';
-import 'package:ice_live_viewer/utils/http/v2/httpapi.dart';
 import 'package:ice_live_viewer/utils/keepalivewrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:ice_live_viewer/model/liveroom.dart';
@@ -99,25 +97,19 @@ class HomePageGridView extends StatelessWidget {
   Widget build(BuildContext context) {
     if (roomsProvider.roomsList.isNotEmpty) {
       return KeepAliveWrapper(
-        child: EasyRefresh(
-          onLoad: () async {
-            return IndicatorResult.success;
-          },
-          onRefresh: () => roomsProvider.getRoomsInfoFromApi(),
-          child: MasonryGridView.count(
-              padding: const EdgeInsets.all(5),
-              controller: ScrollController(),
-              crossAxisCount: screenWidth > 1280
-                  ? 4
-                  : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
-              itemCount: roomsProvider.roomsList.length,
-              physics: (const BouncingScrollPhysics()),
-              itemBuilder: (context, index) {
-                SingleRoom room = roomsProvider.roomsList[index];
-                return RoomCard(
-                    room: room, roomsProvider: roomsProvider, index: index);
-              }),
-        ),
+        child: MasonryGridView.count(
+            padding: const EdgeInsets.all(5),
+            controller: ScrollController(),
+            crossAxisCount: screenWidth > 1280
+                ? 4
+                : (screenWidth > 960 ? 3 : (screenWidth > 640 ? 2 : 1)),
+            itemCount: roomsProvider.roomsList.length,
+            //physics: (const BouncingScrollPhysics()),
+            itemBuilder: (context, index) {
+              SingleRoom room = roomsProvider.roomsList[index];
+              return RoomCard(
+                  room: room, roomsProvider: roomsProvider, index: index);
+            }),
       );
     } else {
       return const HomeEmptyScreen();

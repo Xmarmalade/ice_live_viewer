@@ -24,12 +24,20 @@ class RoomsProvider with ChangeNotifier {
   }
 
   void getRoomsInfoFromApi() async {
+    print('called');
     for (var item in _roomsList) {
       SingleRoom singleRoom = await HttpApi.getLiveInfo(item);
       _roomsList[_roomsList.indexOf(item)] = singleRoom;
       notifyListeners();
       print(singleRoom);
     }
+  }
+
+  Future<bool> refreshRooms() async {
+    _roomsList.clear();
+    _getRoomsFromPrefs(PrefsHelper.getLinksOfRoomsPrefList());
+    getRoomsInfoFromApi();
+    return true;
   }
 
   void _saveRoomsToPrefs() {
@@ -40,8 +48,10 @@ class RoomsProvider with ChangeNotifier {
     PrefsHelper.setLinksOfRoomsPrefList(links);
   }
 
-  void addRoom(String link) {
-    _roomsList.add(SingleRoom.fromLink(link));
+  void addRoom(String link) async {
+    SingleRoom singleRoom = SingleRoom.fromLink(link);
+    singleRoom = await HttpApi.getLiveInfo(singleRoom);
+    _roomsList.add(singleRoom);
     notifyListeners();
     _saveRoomsToPrefs();
   }
