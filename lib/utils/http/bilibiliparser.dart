@@ -77,12 +77,14 @@ Future<Map<String, List>> getStreamLink(String roomId) async {
   List<dynamic> streamMultiList =
       streamJson['data']['playurl_info']['playurl']['stream'];
   //print('streamMultiList: $streamMultiList');
-  Map streamProtocol = streamMultiList[0]['format'][0];
+  //get m3u8 default, if not, get unplayable flv
+  Map streamProtocol =
+      streamMultiList[1]['format'][0] ?? streamMultiList[0]['format'][0];
   Map<String, List> finalStream = {};
   //Find the m3u8-fmp4 link
   for (int i = 0; i < streamMultiList.length; i++) {
     if (streamMultiList[i]['protocol_name'] == 'http_hls') {
-      for (int j = 0; j < streamMultiList[i]['format'][j].length; j++) {
+      for (int j = 0; j < streamMultiList[i]['format'].length; j++) {
         if (streamMultiList[i]['format'][j]['format_name'] == 'fmp4') {
           streamProtocol = streamMultiList[i]['format'][j];
           break;
@@ -112,10 +114,12 @@ Future<Map<String, List>> getStreamLink(String roomId) async {
     List<dynamic> qnStreamMultiList =
         qnJson['data']['playurl_info']['playurl']['stream'];
 
-    Map qnStreamProtocol = qnStreamMultiList[0]['format'][0];
+    //get m3u8 default, if not, get unplayable flv
+    Map qnStreamProtocol =
+        qnStreamMultiList[1]['format'][0] ?? qnStreamMultiList[0]['format'][0];
     for (int i = 0; i < qnStreamMultiList.length; i++) {
       if (qnStreamMultiList[i]['protocol_name'] == 'http_hls') {
-        for (int j = 0; j < qnStreamMultiList[i]['format'][j].length; j++) {
+        for (int j = 0; j < qnStreamMultiList[i]['format'].length; j++) {
           if (qnStreamMultiList[i]['format'][j]['format_name'] == 'fmp4') {
             qnStreamProtocol = qnStreamMultiList[i]['format'][j];
             break;
@@ -183,7 +187,7 @@ Future<Map<String, List>> getStreamLink(String roomId) async {
 ///cover:直播封面
 ///keyframe:视频关键帧
 ///
-///和画质-链接列表{'4': [主线，备线，备线，备线],'3': [主线，备线，备线，备线]}
+///和画质-链接列表
 Future<Map<String, Map<String, dynamic>>> getLiveInfoAndStreamLink(
     String roomId) async {
   Map<String, String> liveInfo = await getLiveInfo(roomId);
