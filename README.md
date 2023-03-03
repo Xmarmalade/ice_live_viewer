@@ -13,6 +13,8 @@ A Flutter project can make you watch live with ease.
 
 一个Flutter直播应用程序，轻松看直播。
 
+# 本项目暂时处于搁置状态
+
 ## Features
 
 - Follow many anchors 追踪各平台主播，包括虎牙，斗鱼和哔哩哔哩
